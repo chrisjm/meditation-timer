@@ -1,14 +1,21 @@
 <script lang="ts">
 	import Progress from '$lib/components/Progress.svelte';
 
+	// Audio elements
+	let startBell = $state<HTMLAudioElement>();
+	let intervalBell = $state<HTMLAudioElement>();
+	let backgroundMusic = $state<HTMLAudioElement>();
+
 	// State using Svelte 5's $state decorator
 	let duration = $state(600); // 10 minutes in seconds
+	let intervalTime = $state(120); // 2 minutes in seconds for interval bell
 	let currentTime = $state(600);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
 	let isPrepping = $state(false);
 	let prepTime = $state(10); // 10 seconds prep time
 	let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
+	let lastIntervalTime = $state(0); // Track last interval bell time
 
 	// Computed values
 	let progress = $derived(isPrepping ? (10 - prepTime) / 10 : (duration - currentTime) / duration);
@@ -25,6 +32,8 @@
 					isPrepping = false;
 					isRunning = true;
 					isPaused = false;
+					startBell?.play();
+					backgroundMusic?.play();
 					startTimer();
 				}
 			}, 1000);
@@ -32,13 +41,21 @@
 	}
 
 	function startTimer() {
+		lastIntervalTime = currentTime;
 		timerInterval = setInterval(() => {
 			if (!isPaused) {
 				currentTime--;
+				// Play interval bell every intervalTime seconds
+				if (lastIntervalTime - currentTime >= intervalTime) {
+					intervalBell?.play();
+					lastIntervalTime = currentTime;
+				}
 				if (currentTime === 0) {
 					if (timerInterval) clearInterval(timerInterval);
 					isRunning = false;
-					// TODO: Play completion sound
+					startBell?.play(); // Use start bell as completion sound
+					backgroundMusic?.pause();
+					backgroundMusic.currentTime = 0;
 				}
 			}
 		}, 1000);
@@ -46,6 +63,11 @@
 
 	function pauseMeditation() {
 		isPaused = !isPaused;
+		if (isPaused) {
+			backgroundMusic?.pause();
+		} else {
+			backgroundMusic?.play();
+		}
 	}
 
 	function resetMeditation() {
@@ -56,6 +78,8 @@
 		prepTime = 10;
 		currentTime = duration;
 		timerInterval = null;
+		backgroundMusic?.pause();
+		backgroundMusic.currentTime = 0;
 	}
 
 	function setDuration(minutes: number) {
@@ -74,6 +98,9 @@
 </script>
 
 <div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
+	<audio bind:this={startBell} src="/tibetan-bell-ding-b-note.mp3" preload="auto"></audio>
+	<audio bind:this={intervalBell} src="/meditation-bell.mp3" preload="auto"></audio>
+	<audio bind:this={backgroundMusic} src="/meditation-opus.ogg" preload="auto" loop></audio>
 	<main class="mx-auto max-w-3xl text-center">
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
