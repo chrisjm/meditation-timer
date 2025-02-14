@@ -54,8 +54,10 @@
 					if (timerInterval) clearInterval(timerInterval);
 					isRunning = false;
 					startBell?.play(); // Use start bell as completion sound
-					backgroundMusic?.pause();
-					backgroundMusic.currentTime = 0;
+					if (backgroundMusic) {
+						backgroundMusic.pause();
+						backgroundMusic.currentTime = 0;
+					}
 				}
 			}
 		}, 1000);
@@ -78,8 +80,10 @@
 		prepTime = 10;
 		currentTime = duration;
 		timerInterval = null;
-		backgroundMusic?.pause();
-		backgroundMusic.currentTime = 0;
+		if (backgroundMusic) {
+			backgroundMusic.pause();
+			backgroundMusic.currentTime = 0;
+		}
 	}
 
 	function setDuration(minutes: number) {
