@@ -2,9 +2,9 @@
 <script lang="ts">
 	import { X } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
-    
+
 	const dispatch = createEventDispatcher();
-	
+
 	export let isOpen = false;
 	export let intervalTime = 120;
 	export let backgroundMusicEnabled = true;
@@ -40,7 +40,7 @@
 
 {#if isOpen}
 	<div
-		class="fixed top-0 right-0 h-full w-80 transform bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-slate-800"
+		class="fixed top-0 right-0 h-full w-80 transform bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-slate-800 z-50"
 	>
 		<div class="relative p-6">
 			<button
