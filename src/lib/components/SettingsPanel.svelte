@@ -1,25 +1,26 @@
 <!-- SettingsPanel.svelte -->
 <script lang="ts">
 	import { X } from 'lucide-svelte';
-	import { createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
+	import { timerSettings } from '$lib/stores/timerSettings';
 
 	export let isOpen = false;
-	export let intervalTime = 120;
-	export let backgroundMusicEnabled = true;
-	export let bellSoundEnabled = true;
 	export let backgroundMusic: HTMLAudioElement | undefined;
 	export let isRunning = false;
 
 	function handleIntervalTimeChange(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
-		dispatch('intervalChange', value);
+		timerSettings.update(settings => ({
+			...settings,
+			intervalTime: value
+		}));
 	}
 
 	function handleBackgroundMusicChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
-		dispatch('backgroundMusicChange', value);
+		timerSettings.update(settings => ({
+			...settings,
+			backgroundMusicEnabled: value
+		}));
 
 		// Dynamically control background music if meditation is running
 		if (backgroundMusic && isRunning) {
@@ -34,13 +35,16 @@
 
 	function handleBellSoundChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
-		dispatch('bellSoundChange', value);
+		timerSettings.update(settings => ({
+			...settings,
+			bellSoundEnabled: value
+		}));
 	}
 </script>
 
 {#if isOpen}
 	<div
-		class="fixed top-0 right-0 h-full w-80 transform bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-slate-800 z-50"
+		class="fixed top-0 right-0 z-50 h-full w-80 transform bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-slate-800"
 	>
 		<div class="relative p-6">
 			<button
@@ -65,7 +69,7 @@
 						id="intervalTime"
 						min="0"
 						step="30"
-						value={intervalTime}
+						value={$timerSettings.intervalTime}
 						on:input={handleIntervalTimeChange}
 						class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					/>
@@ -80,7 +84,7 @@
 						<input
 							type="checkbox"
 							id="bgMusic"
-							checked={backgroundMusicEnabled}
+							checked={$timerSettings.backgroundMusicEnabled}
 							on:change={handleBackgroundMusicChange}
 							class="peer sr-only"
 						/>
@@ -99,7 +103,7 @@
 						<input
 							type="checkbox"
 							id="bellSound"
-							checked={bellSoundEnabled}
+							checked={$timerSettings.bellSoundEnabled}
 							on:change={handleBellSoundChange}
 							class="peer sr-only"
 						/>

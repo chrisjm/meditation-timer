@@ -6,6 +6,8 @@
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { Cog } from 'lucide-svelte';
 	import { timerSettings } from '$lib/stores/timerSettings';
+	import { masterTimer, progress } from '$lib/stores/masterTimer';
+	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 
 	// Screen wake lock
 	let wakeLock = $state<WakeLockSentinel | null>(null);
@@ -18,22 +20,24 @@
 	let intervalBell = $state<HTMLAudioElement | undefined>();
 	let backgroundMusic = $state<HTMLAudioElement | undefined>();
 
-	// Timer runtime state using Svelte 5's $state decorator
-	let currentTime = $state($timerSettings.duration);
-	let isRunning = $state(false);
-	let isPaused = $state(false);
-	let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
-	let lastIntervalTime = $state(0); // Track last interval bell time
+	// Subscribe to interval changes
+	$effect(() => {
+		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled) {
+			intervalBell?.play();
+		}
+	});
 
-	// Computed values
-	let progress = $derived(($timerSettings.duration - currentTime) / $timerSettings.duration);
+	// Subscribe to timer completion
+	$effect(() => {
+		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
+			if ($timerSettings.bellSoundEnabled) startBell?.play();
+			stopAudio();
+		}
+	});
 
 	// Timer controls
 	async function startMeditation() {
-		if (!isRunning) {
-			isRunning = true;
-			isPaused = false;
-
+		if (!$masterTimer.isRunning) {
 			// Request wake lock to keep screen on
 			try {
 				wakeLock = await navigator.wakeLock?.request('screen');
@@ -43,31 +47,8 @@
 
 			if ($timerSettings.bellSoundEnabled) startBell?.play();
 			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
-			startTimer();
+			masterTimer.start($timerSettings.duration);
 		}
-	}
-
-	function startTimer() {
-		lastIntervalTime = currentTime;
-		timerInterval = setInterval(() => {
-			if (!isPaused) {
-				currentTime--;
-				// Play interval bell every intervalTime seconds
-				if (lastIntervalTime - currentTime >= $timerSettings.intervalTime) {
-					if ($timerSettings.bellSoundEnabled) intervalBell?.play();
-					lastIntervalTime = currentTime;
-				}
-				if (currentTime === 0) {
-					if (timerInterval) clearInterval(timerInterval);
-					isRunning = false;
-					if ($timerSettings.bellSoundEnabled) startBell?.play(); // Use start bell as completion sound
-					if (backgroundMusic) {
-						backgroundMusic.pause();
-						backgroundMusic.currentTime = 0;
-					}
-				}
-			}
-		}, 1000);
 	}
 
 	function stopAudio() {
@@ -86,8 +67,8 @@
 	}
 
 	function pauseMeditation() {
-		isPaused = !isPaused;
-		if (isPaused) {
+		masterTimer.pause();
+		if ($masterTimer.isPaused) {
 			stopAudio();
 		} else {
 			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
@@ -95,13 +76,8 @@
 	}
 
 	function resetMeditation() {
-		if (timerInterval) clearInterval(timerInterval);
-		isRunning = false;
-		isPaused = false;
+		masterTimer.reset();
 		stopAudio();
-
-		currentTime = $timerSettings.duration;
-		timerInterval = null;
 
 		// Release wake lock
 		wakeLock
@@ -115,9 +91,9 @@
 	}
 
 	function setDuration(minutes: number) {
-		if (!isRunning) {
+		if (!$masterTimer.isRunning) {
 			$timerSettings.duration = minutes * 60;
-			currentTime = $timerSettings.duration;
+			masterTimer.reset();
 		}
 	}
 </script>
@@ -133,11 +109,8 @@
 	<AudioElements bind:startBell bind:intervalBell bind:backgroundMusic />
 	<SettingsPanel
 		bind:isOpen={isSettingsOpen}
-		intervalTime={$timerSettings.intervalTime}
-		backgroundMusicEnabled={$timerSettings.backgroundMusicEnabled}
-		bellSoundEnabled={$timerSettings.bellSoundEnabled}
 		{backgroundMusic}
-		{isRunning}
+		isRunning={$masterTimer.isRunning}
 		on:close={() => (isSettingsOpen = false)}
 		on:intervalChange={(e) => ($timerSettings.intervalTime = e.detail)}
 		on:backgroundMusicChange={(e) => ($timerSettings.backgroundMusicEnabled = e.detail)}
@@ -147,11 +120,11 @@
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
 
-		<TimerDisplay {progress} time={currentTime} />
+		<TimerDisplay progress={$progress} time={$masterTimer.currentTime} />
 
 		<TimerControls
-			{isRunning}
-			{isPaused}
+			isRunning={$masterTimer.isRunning}
+			isPaused={$masterTimer.isPaused}
 			onStart={startMeditation}
 			onPause={pauseMeditation}
 			onReset={resetMeditation}
