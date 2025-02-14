@@ -99,7 +99,7 @@
 		<div class="mb-8 space-x-4">
 			{#if !isRunning && !isPrepping}
 				<button
-					on:click={startMeditation}
+					onclick={startMeditation}
 					class="rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white
                         transition-colors duration-200 hover:bg-emerald-600"
 				>
@@ -107,14 +107,14 @@
 				</button>
 			{:else}
 				<button
-					on:click={pauseMeditation}
+					onclick={pauseMeditation}
 					class="rounded-lg bg-amber-500 px-6 py-2 font-medium text-white
                         transition-colors duration-200 hover:bg-amber-600"
 				>
 					{isPaused ? 'Resume' : 'Pause'}
 				</button>
 				<button
-					on:click={resetMeditation}
+					onclick={resetMeditation}
 					class="rounded-lg bg-rose-500 px-6 py-2 font-medium text-white
                         transition-colors duration-200 hover:bg-rose-600"
 				>
@@ -127,7 +127,7 @@
 		<div class="mx-auto grid max-w-lg grid-cols-2 gap-4 sm:grid-cols-4">
 			{#each [5, 10, 15, 20] as preset}
 				<button
-					on:click={() => setDuration(preset)}
+					onclick={() => setDuration(preset)}
 					class="rounded-lg bg-slate-200 px-4 py-3 text-slate-700
                         transition-colors duration-200
                         hover:bg-slate-300 dark:bg-slate-800
