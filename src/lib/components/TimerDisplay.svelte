@@ -3,7 +3,6 @@
 
 	export let progress: number;
 	export let time: number;
-	export let isPrepping: boolean;
 
 	// Format time helper
 	function formatTime(seconds: number): string {
@@ -19,7 +18,7 @@
 			{progress}
 			size={256}
 			strokeWidth={8}
-			color={isPrepping ? 'rgb(234 179 8)' : 'rgb(16 185 129)'}
+			color={progress < 0.5 ? 'rgb(239 68 68)' : 'rgb(16 185 129)'}
 		/>
 	</div>
 	<div class="absolute inset-0 flex items-center justify-center">

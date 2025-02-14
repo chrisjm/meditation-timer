@@ -1,23 +1,29 @@
 <!-- SettingsPanel.svelte -->
 <script lang="ts">
 	import { X } from 'lucide-svelte';
+	import { createEventDispatcher } from 'svelte';
+    
+	const dispatch = createEventDispatcher();
+	
 	export let isOpen = false;
-	export let prepTime = 10;
 	export let intervalTime = 120;
 	export let backgroundMusicEnabled = true;
 	export let bellSoundEnabled = true;
 
-	function handlePrepTimeChange(event: Event) {
-		const value = parseInt((event.target as HTMLInputElement).value);
-		prepTime = value;
-	}
-
 	function handleIntervalTimeChange(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
-		intervalTime = value;
+		dispatch('intervalChange', value);
 	}
 
-	$: console.log(isOpen);
+	function handleBackgroundMusicChange(event: Event) {
+		const value = (event.target as HTMLInputElement).checked;
+		dispatch('backgroundMusicChange', value);
+	}
+
+	function handleBellSoundChange(event: Event) {
+		const value = (event.target as HTMLInputElement).checked;
+		dispatch('bellSoundChange', value);
+	}
 </script>
 
 {#if isOpen}
@@ -34,25 +40,6 @@
 			<h2 class="mb-6 text-2xl font-semibold dark:text-white">Settings</h2>
 
 			<div class="space-y-6">
-				<!-- Prep Time -->
-				<div>
-					<label
-						for="prepTime"
-						class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-					>
-						Preparation Time (seconds)
-					</label>
-					<input
-						type="number"
-						id="prepTime"
-						min="0"
-						max="60"
-						bind:value={prepTime}
-						on:input={handlePrepTimeChange}
-						class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-					/>
-				</div>
-
 				<!-- Interval Time -->
 				<div>
 					<label
@@ -66,7 +53,7 @@
 						id="intervalTime"
 						min="0"
 						step="30"
-						bind:value={intervalTime}
+						value={intervalTime}
 						on:input={handleIntervalTimeChange}
 						class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					/>
@@ -81,7 +68,8 @@
 						<input
 							type="checkbox"
 							id="bgMusic"
-							bind:checked={backgroundMusicEnabled}
+							checked={backgroundMusicEnabled}
+							on:change={handleBackgroundMusicChange}
 							class="peer sr-only"
 						/>
 						<div
@@ -99,7 +87,8 @@
 						<input
 							type="checkbox"
 							id="bellSound"
-							bind:checked={bellSoundEnabled}
+							checked={bellSoundEnabled}
+							on:change={handleBellSoundChange}
 							class="peer sr-only"
 						/>
 						<div

@@ -1,6 +1,5 @@
 <script lang="ts">
 	export let isRunning: boolean;
-	export let isPrepping: boolean;
 	export let isPaused: boolean;
 	export let onStart: () => void;
 	export let onPause: () => void;
@@ -8,7 +7,7 @@
 </script>
 
 <div class="mb-8 space-x-4">
-	{#if !isRunning && !isPrepping}
+	{#if !isRunning}
 		<button
 			on:click={onStart}
 			class="rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white

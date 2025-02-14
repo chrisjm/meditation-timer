@@ -5,48 +5,34 @@
 	import AudioElements from '$lib/components/AudioElements.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { Cog } from 'lucide-svelte';
+	import { timerSettings } from '$lib/stores/timerSettings';
 
-	// Settings state
+	// UI state
 	let isSettingsOpen = $state(false);
-	let backgroundMusicEnabled = $state(true);
-	let bellSoundEnabled = $state(true);
 
 	// Audio elements
 	let startBell = $state<HTMLAudioElement | undefined>();
 	let intervalBell = $state<HTMLAudioElement | undefined>();
 	let backgroundMusic = $state<HTMLAudioElement | undefined>();
 
-	// State using Svelte 5's $state decorator
-	let duration = $state(600); // 10 minutes in seconds
-	let intervalTime = $state(120); // 2 minutes in seconds for interval bell
-	let currentTime = $state(600);
+	// Timer runtime state using Svelte 5's $state decorator
+	let currentTime = $state($timerSettings.duration);
 	let isRunning = $state(false);
 	let isPaused = $state(false);
-	let isPrepping = $state(false);
-	let prepTime = $state(10); // 10 seconds prep time
 	let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
 	let lastIntervalTime = $state(0); // Track last interval bell time
 
 	// Computed values
-	let progress = $derived(isPrepping ? (10 - prepTime) / 10 : (duration - currentTime) / duration);
+	let progress = $derived(($timerSettings.duration - currentTime) / $timerSettings.duration);
 
 	// Timer controls
 	function startMeditation() {
 		if (!isRunning) {
-			isPrepping = true;
-			// Start prep countdown
-			const prepInterval = setInterval(() => {
-				prepTime--;
-				if (prepTime === 0) {
-					clearInterval(prepInterval);
-					isPrepping = false;
-					isRunning = true;
-					isPaused = false;
-					if (bellSoundEnabled) startBell?.play();
-					if (backgroundMusicEnabled) backgroundMusic?.play();
-					startTimer();
-				}
-			}, 1000);
+			isRunning = true;
+			isPaused = false;
+			if ($timerSettings.bellSoundEnabled) startBell?.play();
+			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
+			startTimer();
 		}
 	}
 
@@ -56,14 +42,14 @@
 			if (!isPaused) {
 				currentTime--;
 				// Play interval bell every intervalTime seconds
-				if (lastIntervalTime - currentTime >= intervalTime) {
-					if (bellSoundEnabled) intervalBell?.play();
+				if (lastIntervalTime - currentTime >= $timerSettings.intervalTime) {
+					if ($timerSettings.bellSoundEnabled) intervalBell?.play();
 					lastIntervalTime = currentTime;
 				}
 				if (currentTime === 0) {
 					if (timerInterval) clearInterval(timerInterval);
 					isRunning = false;
-					if (bellSoundEnabled) startBell?.play(); // Use start bell as completion sound
+					if ($timerSettings.bellSoundEnabled) startBell?.play(); // Use start bell as completion sound
 					if (backgroundMusic) {
 						backgroundMusic.pause();
 						backgroundMusic.currentTime = 0;
@@ -78,7 +64,7 @@
 		if (isPaused) {
 			backgroundMusic?.pause();
 		} else {
-			if (backgroundMusicEnabled) backgroundMusic?.play();
+			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
 		}
 	}
 
@@ -86,9 +72,8 @@
 		if (timerInterval) clearInterval(timerInterval);
 		isRunning = false;
 		isPaused = false;
-		isPrepping = false;
-		prepTime = 10;
-		currentTime = duration;
+
+		currentTime = $timerSettings.duration;
 		timerInterval = null;
 		if (backgroundMusic) {
 			backgroundMusic.pause();
@@ -97,9 +82,9 @@
 	}
 
 	function setDuration(minutes: number) {
-		if (!isRunning && !isPrepping) {
-			duration = minutes * 60;
-			currentTime = duration;
+		if (!isRunning) {
+			$timerSettings.duration = minutes * 60;
+			currentTime = $timerSettings.duration;
 		}
 	}
 </script>
@@ -107,18 +92,20 @@
 <div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900 relative">
 	<!-- Settings Button -->
 	<button
-		on:click={() => isSettingsOpen = !isSettingsOpen}
+		onclick={() => isSettingsOpen = !isSettingsOpen}
 		class="fixed top-4 right-4 p-2 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
 		<Cog class="w-6 h-6 text-gray-600 dark:text-gray-300" />
 	</button>
 	<AudioElements bind:startBell bind:intervalBell bind:backgroundMusic />
 	<SettingsPanel
 		bind:isOpen={isSettingsOpen}
-		bind:prepTime
-		bind:intervalTime
-		bind:backgroundMusicEnabled
-		bind:bellSoundEnabled
+		intervalTime={$timerSettings.intervalTime}
+		backgroundMusicEnabled={$timerSettings.backgroundMusicEnabled}
+		bellSoundEnabled={$timerSettings.bellSoundEnabled}
 		on:close={() => isSettingsOpen = false}
+		on:intervalChange={(e) => $timerSettings.intervalTime = e.detail}
+		on:backgroundMusicChange={(e) => $timerSettings.backgroundMusicEnabled = e.detail}
+		on:bellSoundChange={(e) => $timerSettings.bellSoundEnabled = e.detail}
 	/>
 	<main class="mx-auto max-w-3xl text-center">
 		<!-- Header -->
@@ -126,13 +113,11 @@
 
 		<TimerDisplay
 			{progress}
-			time={isPrepping ? prepTime : currentTime}
-			{isPrepping}
+			time={currentTime}
 		/>
 
 		<TimerControls
 			{isRunning}
-			{isPrepping}
 			{isPaused}
 			onStart={startMeditation}
 			onPause={pauseMeditation}
@@ -140,7 +125,7 @@
 		/>
 
 		<TimerPresets
-			{duration}
+			duration={$timerSettings.duration}
 			onSetDuration={setDuration}
 		/>
 	</main>
