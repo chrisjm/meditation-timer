@@ -9,6 +9,8 @@
 	export let intervalTime = 120;
 	export let backgroundMusicEnabled = true;
 	export let bellSoundEnabled = true;
+	export let backgroundMusic: HTMLAudioElement | undefined;
+	export let isRunning = false;
 
 	function handleIntervalTimeChange(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
@@ -18,6 +20,16 @@
 	function handleBackgroundMusicChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
 		dispatch('backgroundMusicChange', value);
+
+		// Dynamically control background music if meditation is running
+		if (backgroundMusic && isRunning) {
+			if (value) {
+				backgroundMusic.play();
+			} else {
+				backgroundMusic.pause();
+				backgroundMusic.currentTime = 0;
+			}
+		}
 	}
 
 	function handleBellSoundChange(event: Event) {

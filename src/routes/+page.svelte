@@ -102,6 +102,8 @@
 		intervalTime={$timerSettings.intervalTime}
 		backgroundMusicEnabled={$timerSettings.backgroundMusicEnabled}
 		bellSoundEnabled={$timerSettings.bellSoundEnabled}
+		{backgroundMusic}
+		{isRunning}
 		on:close={() => isSettingsOpen = false}
 		on:intervalChange={(e) => $timerSettings.intervalTime = e.detail}
 		on:backgroundMusicChange={(e) => $timerSettings.backgroundMusicEnabled = e.detail}
