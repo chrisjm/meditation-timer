@@ -3,6 +3,13 @@
 	import TimerControls from '$lib/components/TimerControls.svelte';
 	import TimerPresets from '$lib/components/TimerPresets.svelte';
 	import AudioElements from '$lib/components/AudioElements.svelte';
+	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+	import { Cog } from 'lucide-svelte';
+
+	// Settings state
+	let isSettingsOpen = $state(false);
+	let backgroundMusicEnabled = $state(true);
+	let bellSoundEnabled = $state(true);
 
 	// Audio elements
 	let startBell = $state<HTMLAudioElement | undefined>();
@@ -35,8 +42,8 @@
 					isPrepping = false;
 					isRunning = true;
 					isPaused = false;
-					startBell?.play();
-					backgroundMusic?.play();
+					if (bellSoundEnabled) startBell?.play();
+					if (backgroundMusicEnabled) backgroundMusic?.play();
 					startTimer();
 				}
 			}, 1000);
@@ -50,13 +57,13 @@
 				currentTime--;
 				// Play interval bell every intervalTime seconds
 				if (lastIntervalTime - currentTime >= intervalTime) {
-					intervalBell?.play();
+					if (bellSoundEnabled) intervalBell?.play();
 					lastIntervalTime = currentTime;
 				}
 				if (currentTime === 0) {
 					if (timerInterval) clearInterval(timerInterval);
 					isRunning = false;
-					startBell?.play(); // Use start bell as completion sound
+					if (bellSoundEnabled) startBell?.play(); // Use start bell as completion sound
 					if (backgroundMusic) {
 						backgroundMusic.pause();
 						backgroundMusic.currentTime = 0;
@@ -71,7 +78,7 @@
 		if (isPaused) {
 			backgroundMusic?.pause();
 		} else {
-			backgroundMusic?.play();
+			if (backgroundMusicEnabled) backgroundMusic?.play();
 		}
 	}
 
@@ -97,8 +104,22 @@
 	}
 </script>
 
-<div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
+<div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900 relative">
+	<!-- Settings Button -->
+	<button
+		on:click={() => isSettingsOpen = !isSettingsOpen}
+		class="fixed top-4 right-4 p-2 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+		<Cog class="w-6 h-6 text-gray-600 dark:text-gray-300" />
+	</button>
 	<AudioElements bind:startBell bind:intervalBell bind:backgroundMusic />
+	<SettingsPanel
+		bind:isOpen={isSettingsOpen}
+		bind:prepTime
+		bind:intervalTime
+		bind:backgroundMusicEnabled
+		bind:bellSoundEnabled
+		on:close={() => isSettingsOpen = false}
+	/>
 	<main class="mx-auto max-w-3xl text-center">
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
