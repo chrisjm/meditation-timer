@@ -22,7 +22,6 @@ flowchart TD
         TimerPresets[Timer Presets]
         Bells[Bell System]
         HealingTones[Healing Tones]
-        PrepTimer[Preparation Timer]
         PauseResume[Pause/Resume]
     end
 
@@ -33,11 +32,10 @@ flowchart TD
     Timer --> DB
     AudioPlayer --> AudioFiles
     Settings --> LocalStorage
-    
+
     TimerPresets --> UI
     Bells --> AudioPlayer
     HealingTones --> AudioPlayer
-    PrepTimer --> Timer
     PauseResume --> Timer
 ```
 
@@ -45,7 +43,6 @@ flowchart TD
 
 1. Core Features:
    - Timer with presets (5, 10, 15, 20 minutes + custom)
-   - 10-second preparation countdown
    - Pause/Resume functionality
    - Circular progress indicator
    - Background healing tones
@@ -109,11 +106,11 @@ CREATE TABLE sessions (
     AudioPlayer.svelte   // Audio handling
     BellSelector.svelte  // Bell sound options
     FreqSelector.svelte  // Healing tone selector
-  
+
   stores/
     settings.js          // LocalStorage settings
     session.js          // Session management
-  
+
   db/
     database.js         // SQLite operations
 ```
