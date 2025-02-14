@@ -6,4 +6,4 @@
 
 <audio bind:this={startBell} src="/tibetan-bell-ding-b-note.mp3" preload="auto"></audio>
 <audio bind:this={intervalBell} src="/meditation-bell.mp3" preload="auto"></audio>
-<audio bind:this={backgroundMusic} src="/meditation-opus.ogg" preload="auto" loop></audio>
+<!-- <audio bind:this={backgroundMusic} src="/meditation-opus.ogg" preload="auto" loop></audio> -->
