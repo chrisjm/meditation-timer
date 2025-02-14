@@ -7,6 +7,9 @@
 	import { Cog } from 'lucide-svelte';
 	import { timerSettings } from '$lib/stores/timerSettings';
 
+	// Screen wake lock
+	let wakeLock = $state<WakeLockSentinel | null>(null);
+
 	// UI state
 	let isSettingsOpen = $state(false);
 
@@ -26,10 +29,18 @@
 	let progress = $derived(($timerSettings.duration - currentTime) / $timerSettings.duration);
 
 	// Timer controls
-	function startMeditation() {
+	async function startMeditation() {
 		if (!isRunning) {
 			isRunning = true;
 			isPaused = false;
+
+			// Request wake lock to keep screen on
+			try {
+				wakeLock = await navigator.wakeLock?.request('screen');
+			} catch (err) {
+				console.log(`Failed to request wake lock: ${err}`)
+			}
+
 			if ($timerSettings.bellSoundEnabled) startBell?.play();
 			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
 			startTimer();
@@ -90,6 +101,15 @@
 			backgroundMusic.pause();
 			backgroundMusic.currentTime = 0;
 		}
+
+		// Release wake lock
+		wakeLock?.release()
+			.then(() => {
+				wakeLock = null;
+			})
+			.catch((err) => {
+				console.log(`Failed to release wake lock: ${err}`);
+			});
 	}
 
 	function setDuration(minutes: number) {
