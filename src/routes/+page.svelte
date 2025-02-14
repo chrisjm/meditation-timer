@@ -38,7 +38,7 @@
 			try {
 				wakeLock = await navigator.wakeLock?.request('screen');
 			} catch (err) {
-				console.log(`Failed to request wake lock: ${err}`)
+				console.log(`Failed to request wake lock: ${err}`);
 			}
 
 			if ($timerSettings.bellSoundEnabled) startBell?.play();
@@ -70,22 +70,26 @@
 		}, 1000);
 	}
 
+	function stopAudio() {
+		if (startBell) {
+			startBell.pause();
+			startBell.currentTime = 0;
+		}
+		if (intervalBell) {
+			intervalBell.pause();
+			intervalBell.currentTime = 0;
+		}
+		if (backgroundMusic) {
+			backgroundMusic.pause();
+			backgroundMusic.currentTime = 0;
+		}
+	}
+
 	function pauseMeditation() {
 		isPaused = !isPaused;
 		if (isPaused) {
-			// Pause background music
-			backgroundMusic?.pause();
-			// Stop any currently playing bell sounds
-			if (startBell) {
-				startBell.pause();
-				startBell.currentTime = 0;
-			}
-			if (intervalBell) {
-				intervalBell.pause();
-				intervalBell.currentTime = 0;
-			}
+			stopAudio();
 		} else {
-			// Resume background music if enabled
 			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
 		}
 	}
@@ -94,16 +98,14 @@
 		if (timerInterval) clearInterval(timerInterval);
 		isRunning = false;
 		isPaused = false;
+		stopAudio();
 
 		currentTime = $timerSettings.duration;
 		timerInterval = null;
-		if (backgroundMusic) {
-			backgroundMusic.pause();
-			backgroundMusic.currentTime = 0;
-		}
 
 		// Release wake lock
-		wakeLock?.release()
+		wakeLock
+			?.release()
 			.then(() => {
 				wakeLock = null;
 			})
@@ -120,12 +122,13 @@
 	}
 </script>
 
-<div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900 relative">
+<div class="relative min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
 	<!-- Settings Button -->
 	<button
-		onclick={() => isSettingsOpen = !isSettingsOpen}
-		class="fixed top-4 right-4 p-2 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-		<Cog class="w-6 h-6 text-gray-600 dark:text-gray-300" />
+		onclick={() => (isSettingsOpen = !isSettingsOpen)}
+		class="fixed top-4 right-4 rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
+	>
+		<Cog class="h-6 w-6 text-gray-600 dark:text-gray-300" />
 	</button>
 	<AudioElements bind:startBell bind:intervalBell bind:backgroundMusic />
 	<SettingsPanel
@@ -135,19 +138,16 @@
 		bellSoundEnabled={$timerSettings.bellSoundEnabled}
 		{backgroundMusic}
 		{isRunning}
-		on:close={() => isSettingsOpen = false}
-		on:intervalChange={(e) => $timerSettings.intervalTime = e.detail}
-		on:backgroundMusicChange={(e) => $timerSettings.backgroundMusicEnabled = e.detail}
-		on:bellSoundChange={(e) => $timerSettings.bellSoundEnabled = e.detail}
+		on:close={() => (isSettingsOpen = false)}
+		on:intervalChange={(e) => ($timerSettings.intervalTime = e.detail)}
+		on:backgroundMusicChange={(e) => ($timerSettings.backgroundMusicEnabled = e.detail)}
+		on:bellSoundChange={(e) => ($timerSettings.bellSoundEnabled = e.detail)}
 	/>
 	<main class="mx-auto max-w-3xl text-center">
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
 
-		<TimerDisplay
-			{progress}
-			time={currentTime}
-		/>
+		<TimerDisplay {progress} time={currentTime} />
 
 		<TimerControls
 			{isRunning}
@@ -157,9 +157,6 @@
 			onReset={resetMeditation}
 		/>
 
-		<TimerPresets
-			duration={$timerSettings.duration}
-			onSetDuration={setDuration}
-		/>
+		<TimerPresets duration={$timerSettings.duration} onSetDuration={setDuration} />
 	</main>
 </div>
