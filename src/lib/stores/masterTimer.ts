@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { timerSettings } from './timerSettings';
 
 interface TimerState {
@@ -9,7 +9,7 @@ interface TimerState {
 
 function createMasterTimer() {
     const { subscribe, set, update } = writable<TimerState>({
-        currentTime: 0,
+        currentTime: get(timerSettings).duration ?? 0,
         isRunning: false,
         isPaused: false
     });
@@ -38,11 +38,11 @@ function createMasterTimer() {
         },
         reset: () => {
             if (interval) clearInterval(interval);
-            set({ currentTime: 0, isRunning: false, isPaused: false });
+            set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
         },
         stop: () => {
             if (interval) clearInterval(interval);
-            set({ currentTime: 0, isRunning: false, isPaused: false });
+            set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
         }
     };
 }

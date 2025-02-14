@@ -12,8 +12,11 @@
 			class="rounded-lg bg-slate-200 px-4 py-3 text-slate-700
 				transition-colors duration-200
 				hover:bg-slate-300 dark:bg-slate-800
-				dark:text-slate-300 dark:hover:bg-slate-700
-				${duration === preset * 60 ? 'ring-2 ring-emerald-500' : ''}"
+				dark:text-slate-300 dark:hover:bg-slate-700"
+			class:ring-2={duration === preset * 60}
+			class:ring-emerald-500={duration === preset * 60}
+			aria-label="Set timer to {preset} minutes"
+			tabindex="0"
 		>
 			{preset} min
 		</button>
