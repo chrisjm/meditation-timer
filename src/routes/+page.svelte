@@ -1,2 +1,142 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import Progress from '$lib/components/Progress.svelte';
+
+	// State using Svelte 5's $state decorator
+	let duration = $state(600); // 10 minutes in seconds
+	let currentTime = $state(600);
+	let isRunning = $state(false);
+	let isPaused = $state(false);
+	let isPrepping = $state(false);
+	let prepTime = $state(10); // 10 seconds prep time
+	let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
+
+	// Computed values
+	let progress = $derived(isPrepping ? (10 - prepTime) / 10 : (duration - currentTime) / duration);
+
+	// Timer controls
+	function startMeditation() {
+		if (!isRunning) {
+			isPrepping = true;
+			// Start prep countdown
+			const prepInterval = setInterval(() => {
+				prepTime--;
+				if (prepTime === 0) {
+					clearInterval(prepInterval);
+					isPrepping = false;
+					isRunning = true;
+					isPaused = false;
+					startTimer();
+				}
+			}, 1000);
+		}
+	}
+
+	function startTimer() {
+		timerInterval = setInterval(() => {
+			if (!isPaused) {
+				currentTime--;
+				if (currentTime === 0) {
+					if (timerInterval) clearInterval(timerInterval);
+					isRunning = false;
+					// TODO: Play completion sound
+				}
+			}
+		}, 1000);
+	}
+
+	function pauseMeditation() {
+		isPaused = !isPaused;
+	}
+
+	function resetMeditation() {
+		if (timerInterval) clearInterval(timerInterval);
+		isRunning = false;
+		isPaused = false;
+		isPrepping = false;
+		prepTime = 10;
+		currentTime = duration;
+		timerInterval = null;
+	}
+
+	function setDuration(minutes: number) {
+		if (!isRunning && !isPrepping) {
+			duration = minutes * 60;
+			currentTime = duration;
+		}
+	}
+
+	// Format time helper
+	function formatTime(seconds: number): string {
+		const mins = Math.floor(seconds / 60);
+		const secs = seconds % 60;
+		return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+	}
+</script>
+
+<div class="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
+	<main class="mx-auto max-w-3xl text-center">
+		<!-- Header -->
+		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
+
+		<!-- Timer Display -->
+		<div class="relative mx-auto mb-8 h-64 w-64">
+			<div class="absolute inset-0">
+				<Progress
+					{progress}
+					size={256}
+					strokeWidth={8}
+					color={isPrepping ? 'rgb(234 179 8)' : 'rgb(16 185 129)'}
+				/>
+			</div>
+			<div class="absolute inset-0 flex items-center justify-center">
+				<span class="font-mono text-5xl text-slate-700 dark:text-slate-300">
+					{isPrepping ? formatTime(prepTime) : formatTime(currentTime)}
+				</span>
+			</div>
+		</div>
+
+		<!-- Timer Controls -->
+		<div class="mb-8 space-x-4">
+			{#if !isRunning && !isPrepping}
+				<button
+					on:click={startMeditation}
+					class="rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white
+                        transition-colors duration-200 hover:bg-emerald-600"
+				>
+					Start
+				</button>
+			{:else}
+				<button
+					on:click={pauseMeditation}
+					class="rounded-lg bg-amber-500 px-6 py-2 font-medium text-white
+                        transition-colors duration-200 hover:bg-amber-600"
+				>
+					{isPaused ? 'Resume' : 'Pause'}
+				</button>
+				<button
+					on:click={resetMeditation}
+					class="rounded-lg bg-rose-500 px-6 py-2 font-medium text-white
+                        transition-colors duration-200 hover:bg-rose-600"
+				>
+					Reset
+				</button>
+			{/if}
+		</div>
+
+		<!-- Timer Presets -->
+		<div class="mx-auto grid max-w-lg grid-cols-2 gap-4 sm:grid-cols-4">
+			{#each [5, 10, 15, 20] as preset}
+				<button
+					on:click={() => setDuration(preset)}
+					class="rounded-lg bg-slate-200 px-4 py-3 text-slate-700
+                        transition-colors duration-200
+                        hover:bg-slate-300 dark:bg-slate-800
+                        dark:text-slate-300 dark:hover:bg-slate-700
+                        ${duration === preset * 60 ? 'ring-2 ring-emerald-500' : ''}"
+				>
+					{preset} min
+				</button>
+			{/each}
+		</div>
+	</main>
+</div>
