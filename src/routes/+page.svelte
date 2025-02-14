@@ -62,8 +62,19 @@
 	function pauseMeditation() {
 		isPaused = !isPaused;
 		if (isPaused) {
+			// Pause background music
 			backgroundMusic?.pause();
+			// Stop any currently playing bell sounds
+			if (startBell) {
+				startBell.pause();
+				startBell.currentTime = 0;
+			}
+			if (intervalBell) {
+				intervalBell.pause();
+				intervalBell.currentTime = 0;
+			}
 		} else {
+			// Resume background music if enabled
 			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
 		}
 	}
