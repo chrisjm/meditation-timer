@@ -15,6 +15,7 @@
 		class="text-slate-200 dark:text-slate-800"
 		stroke="currentColor"
 		fill="none"
+		stroke-linecap="round"
 		stroke-width={strokeWidth}
 		cx={center}
 		cy={center}
@@ -23,9 +24,10 @@
 
 	<!-- Progress circle -->
 	<circle
-		class={color}
 		stroke="currentColor"
+		class="text-slate-900 dark:text-slate-100"
 		fill="none"
+		stroke-linecap="round"
 		stroke-width={strokeWidth}
 		cx={center}
 		cy={center}
