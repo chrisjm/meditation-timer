@@ -49,12 +49,11 @@
 		}
 	});
 
-	// Handle meditation stop with final bell and cleanup
-	async function handleMeditationStop() {
-		// First stop all current audio
+	// Handle meditation completion with final bell
+	async function handleMeditationComplete() {
 		await handleAudio('stop');
 
-		// Then play the final bell if enabled
+		// Play the final bell if enabled
 		if ($timerSettings.bellSoundEnabled && startBell) {
 			try {
 				startBell.currentTime = 0;
@@ -69,10 +68,17 @@
 		masterTimer.reset();
 	}
 
+	// Handle meditation stop without final bell
+	async function handleMeditationStop() {
+		await handleAudio('stop');
+		await handleWakeLock('release');
+		masterTimer.reset();
+	}
+
 	// Subscribe to timer completion
 	$effect(() => {
 		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
-			handleMeditationStop();
+			handleMeditationComplete();
 		}
 	});
 
