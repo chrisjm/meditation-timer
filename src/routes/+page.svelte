@@ -25,7 +25,7 @@
 		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled && intervalBell) {
 			// Reset the audio before playing
 			intervalBell.currentTime = 0;
-			intervalBell.play().catch(err => {
+			intervalBell.play().catch((err) => {
 				console.error('Failed to play interval bell:', err);
 			});
 		}
@@ -34,8 +34,21 @@
 	// Subscribe to timer completion
 	$effect(() => {
 		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
-			if ($timerSettings.bellSoundEnabled) startBell?.play();
-			stopAudio();
+			if ($timerSettings.bellSoundEnabled && startBell) {
+				// Play the final bell and wait for it to finish before stopping other audio
+				startBell.currentTime = 0;
+				startBell
+					.play()
+					.then(() => {
+						stopAudio();
+					})
+					.catch((err) => {
+						console.error('Failed to play final bell:', err);
+						stopAudio();
+					});
+			} else {
+				stopAudio();
+			}
 		}
 	});
 
@@ -49,24 +62,28 @@
 				console.log(`Failed to request wake lock: ${err}`);
 			}
 
-			if ($timerSettings.bellSoundEnabled) startBell?.play();
-			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
-			masterTimer.start($timerSettings.duration);
+			if ($timerSettings.bellSoundEnabled && startBell) {
+				startBell.currentTime = 0;
+				startBell.play().catch((err) => console.error('Failed to play start bell:', err));
+			}
+			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
+				backgroundMusic.currentTime = 0;
+				backgroundMusic
+					.play()
+					.catch((err) => console.error('Failed to play background music:', err));
+			}
+			masterTimer.start($timerSettings.duration, $timerSettings.isDebugMode);
 		}
 	}
 
 	function stopAudio() {
-		if (startBell) {
-			startBell.pause();
-			startBell.currentTime = 0;
+		if (backgroundMusic) {
+			backgroundMusic.pause();
+			backgroundMusic.currentTime = 0;
 		}
 		if (intervalBell) {
 			intervalBell.pause();
 			intervalBell.currentTime = 0;
-		}
-		if (backgroundMusic) {
-			backgroundMusic.pause();
-			backgroundMusic.currentTime = 0;
 		}
 	}
 

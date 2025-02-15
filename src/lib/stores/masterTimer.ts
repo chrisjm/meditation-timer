@@ -18,7 +18,7 @@ function createMasterTimer() {
 
     return {
         subscribe,
-        start: (duration: number) => {
+        start: (duration: number, debug = false) => {
             set({ currentTime: duration, isRunning: true, isPaused: false });
             interval = setInterval(() => {
                 update(state => {
@@ -31,7 +31,7 @@ function createMasterTimer() {
                     }
                     return state;
                 });
-            }, 1000);
+            }, debug ? 100 : 1000); // 10x faster in debug mode
         },
         pause: () => {
             update(state => ({ ...state, isPaused: !state.isPaused }));

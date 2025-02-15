@@ -9,9 +9,17 @@
 	export let backgroundMusic: HTMLAudioElement | undefined;
 	export let isRunning = false;
 
+	function handleDebugModeChange(event: Event) {
+		const value = (event.target as HTMLInputElement).checked;
+		timerSettings.update((settings) => ({
+			...settings,
+			isDebugMode: value
+		}));
+	}
+
 	function handleIntervalTimeChange(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
-		timerSettings.update(settings => ({
+		timerSettings.update((settings) => ({
 			...settings,
 			intervalTime: value
 		}));
@@ -19,7 +27,7 @@
 
 	function handleBackgroundMusicChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
-		timerSettings.update(settings => ({
+		timerSettings.update((settings) => ({
 			...settings,
 			backgroundMusicEnabled: value
 		}));
@@ -37,7 +45,7 @@
 
 	function handleBellSoundChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
-		timerSettings.update(settings => ({
+		timerSettings.update((settings) => ({
 			...settings,
 			bellSoundEnabled: value
 		}));
@@ -76,6 +84,17 @@
 					onChange={handleBellSoundChange}
 					label="Bell Sounds"
 				/>
+
+				{#if import.meta.env.DEV}
+					<div class="mt-8 border-t border-gray-200 pt-4 dark:border-gray-700">
+						<ToggleSwitch
+							id="debugMode"
+							checked={$timerSettings.isDebugMode}
+							onChange={handleDebugModeChange}
+							label="Debug Mode (10x faster)"
+						/>
+					</div>
+				{/if}
 			</div>
 
 			<StoreDebugInfo />

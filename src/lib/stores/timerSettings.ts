@@ -5,6 +5,7 @@ interface TimerSettings {
     intervalTime: number;
     backgroundMusicEnabled: boolean;
     bellSoundEnabled: boolean;
+    isDebugMode: boolean;
 }
 
 const defaultSettings: TimerSettings = {
@@ -12,6 +13,7 @@ const defaultSettings: TimerSettings = {
     intervalTime: 120,
     backgroundMusicEnabled: true,
     bellSoundEnabled: true,
+    isDebugMode: false,
 };
 
 function createTimerSettings() {
