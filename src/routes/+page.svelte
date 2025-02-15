@@ -31,36 +31,34 @@
 		}
 	});
 
+	// Handle meditation stop with final bell and cleanup
+	async function handleMeditationStop() {
+		if ($timerSettings.bellSoundEnabled && startBell) {
+			try {
+				handleAudio('stop');
+				startBell.currentTime = 0;
+				await startBell.play();
+			} catch (err) {
+				console.error('Failed to play final bell:', err);
+			}
+		}
+
+		handleAudio('stop');
+		await handleWakeLock('release');
+		masterTimer.reset();
+	}
+
 	// Subscribe to timer completion
 	$effect(() => {
 		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
-			if ($timerSettings.bellSoundEnabled && startBell) {
-				// Play the final bell and wait for it to finish before stopping other audio
-				startBell.currentTime = 0;
-				startBell
-					.play()
-					.then(() => {
-						stopAudio();
-					})
-					.catch((err) => {
-						console.error('Failed to play final bell:', err);
-						stopAudio();
-					});
-			} else {
-				stopAudio();
-			}
+			handleMeditationStop();
 		}
 	});
 
 	// Timer controls
 	async function startMeditation() {
 		if (!$masterTimer.isRunning) {
-			// Request wake lock to keep screen on
-			try {
-				wakeLock = await navigator.wakeLock?.request('screen');
-			} catch (err) {
-				console.log(`Failed to request wake lock: ${err}`);
-			}
+			await handleWakeLock('acquire');
 
 			if ($timerSettings.bellSoundEnabled && startBell) {
 				startBell.currentTime = 0;
@@ -76,39 +74,58 @@
 		}
 	}
 
-	function stopAudio() {
-		if (backgroundMusic) {
-			backgroundMusic.pause();
-			backgroundMusic.currentTime = 0;
-		}
-		if (intervalBell) {
-			intervalBell.pause();
-			intervalBell.currentTime = 0;
+	function handleAudio(action: 'stop' | 'resume') {
+		if (action === 'stop') {
+			if (startBell) {
+				startBell.pause();
+				startBell.currentTime = 0;
+			}
+			if (backgroundMusic) {
+				backgroundMusic.pause();
+				backgroundMusic.currentTime = 0;
+			}
+			if (intervalBell) {
+				intervalBell.pause();
+				intervalBell.currentTime = 0;
+			}
+		} else if (action === 'resume' && !$masterTimer.isPaused) {
+			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
+				backgroundMusic
+					.play()
+					.catch((err) => console.error('Failed to resume background music:', err));
+			}
 		}
 	}
 
-	function pauseMeditation() {
+	async function handleWakeLock(action: 'acquire' | 'release') {
+		if (action === 'acquire' && !wakeLock) {
+			try {
+				wakeLock = await navigator.wakeLock?.request('screen');
+			} catch (err) {
+				console.log(`Failed to request wake lock: ${err}`);
+			}
+		} else if (action === 'release' && wakeLock) {
+			try {
+				await wakeLock.release();
+				wakeLock = null;
+			} catch (err) {
+				console.log(`Failed to release wake lock: ${err}`);
+			}
+		}
+	}
+
+	async function pauseMeditation() {
 		masterTimer.pause();
 		if ($masterTimer.isPaused) {
-			stopAudio();
+			handleAudio('stop');
+			await handleWakeLock('release');
 		} else {
-			if ($timerSettings.backgroundMusicEnabled) backgroundMusic?.play();
+			handleAudio('resume');
 		}
 	}
 
-	function resetMeditation() {
-		masterTimer.reset();
-		stopAudio();
-
-		// Release wake lock
-		wakeLock
-			?.release()
-			.then(() => {
-				wakeLock = null;
-			})
-			.catch((err) => {
-				console.log(`Failed to release wake lock: ${err}`);
-			});
+	async function resetMeditation() {
+		await handleMeditationStop();
 	}
 
 	function setDuration(minutes: number) {
