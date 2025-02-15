@@ -22,8 +22,12 @@
 
 	// Subscribe to interval changes
 	$effect(() => {
-		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled) {
-			intervalBell?.play();
+		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled && intervalBell) {
+			// Reset the audio before playing
+			intervalBell.currentTime = 0;
+			intervalBell.play().catch(err => {
+				console.error('Failed to play interval bell:', err);
+			});
 		}
 	});
 
