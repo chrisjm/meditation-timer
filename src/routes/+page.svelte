@@ -8,6 +8,7 @@
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer, progress } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
+	import { audioState } from '$lib/stores/audioState';
 
 	// Screen wake lock
 	let wakeLock = $state<WakeLockSentinel | null>(null);
@@ -20,30 +21,50 @@
 	let intervalBell = $state<HTMLAudioElement | undefined>();
 	let backgroundMusic = $state<HTMLAudioElement | undefined>();
 
+	// Initialize audio event listeners
+	$effect(() => {
+		if (startBell) {
+			startBell.addEventListener('ended', () => audioState.trackAudio(startBell, false));
+			startBell.addEventListener('play', () => audioState.trackAudio(startBell, true));
+		}
+		if (intervalBell) {
+			intervalBell.addEventListener('ended', () => audioState.trackAudio(intervalBell, false));
+			intervalBell.addEventListener('play', () => audioState.trackAudio(intervalBell, true));
+		}
+		if (backgroundMusic) {
+			backgroundMusic.addEventListener('play', () => audioState.trackAudio(backgroundMusic, true));
+			backgroundMusic.addEventListener('pause', () => audioState.trackAudio(backgroundMusic, false));
+		}
+	});
+
 	// Subscribe to interval changes
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled && intervalBell) {
-			// Reset the audio before playing
+			// Reset and play the interval bell
 			intervalBell.currentTime = 0;
 			intervalBell.play().catch((err) => {
 				console.error('Failed to play interval bell:', err);
+				audioState.trackAudio(intervalBell, false);
 			});
 		}
 	});
 
 	// Handle meditation stop with final bell and cleanup
 	async function handleMeditationStop() {
+		// First stop all current audio
+		await handleAudio('stop');
+
+		// Then play the final bell if enabled
 		if ($timerSettings.bellSoundEnabled && startBell) {
 			try {
-				handleAudio('stop');
 				startBell.currentTime = 0;
 				await startBell.play();
 			} catch (err) {
 				console.error('Failed to play final bell:', err);
+				audioState.trackAudio(startBell, false);
 			}
 		}
 
-		handleAudio('stop');
 		await handleWakeLock('release');
 		masterTimer.reset();
 	}
@@ -60,39 +81,51 @@
 		if (!$masterTimer.isRunning) {
 			await handleWakeLock('acquire');
 
+			// Play start bell first if enabled
 			if ($timerSettings.bellSoundEnabled && startBell) {
-				startBell.currentTime = 0;
-				startBell.play().catch((err) => console.error('Failed to play start bell:', err));
+				try {
+					startBell.currentTime = 0;
+					await startBell.play();
+				} catch (err) {
+					console.error('Failed to play start bell:', err);
+					audioState.trackAudio(startBell, false);
+				}
 			}
+
+			// Then start background music if enabled
 			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
-				backgroundMusic.currentTime = 0;
-				backgroundMusic
-					.play()
-					.catch((err) => console.error('Failed to play background music:', err));
+				try {
+					backgroundMusic.currentTime = 0;
+					await backgroundMusic.play();
+				} catch (err) {
+					console.error('Failed to play background music:', err);
+					audioState.trackAudio(backgroundMusic, false);
+				}
 			}
+
 			masterTimer.start($timerSettings.duration, $timerSettings.isDebugMode);
 		}
 	}
 
-	function handleAudio(action: 'stop' | 'resume') {
+	async function handleAudio(action: 'stop' | 'resume') {
+		const audioElements = [startBell, intervalBell, backgroundMusic].filter((audio): audio is HTMLAudioElement => audio !== undefined);
+
 		if (action === 'stop') {
-			if (startBell) {
-				startBell.pause();
-				startBell.currentTime = 0;
-			}
-			if (backgroundMusic) {
-				backgroundMusic.pause();
-				backgroundMusic.currentTime = 0;
-			}
-			if (intervalBell) {
-				intervalBell.pause();
-				intervalBell.currentTime = 0;
-			}
+			await Promise.all(
+				audioElements.map(async (audio) => {
+					await audio.pause();
+					audio.currentTime = 0;
+					audioState.trackAudio(audio, false);
+				})
+			);
 		} else if (action === 'resume' && !$masterTimer.isPaused) {
 			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
-				backgroundMusic
-					.play()
-					.catch((err) => console.error('Failed to resume background music:', err));
+				try {
+					await backgroundMusic.play();
+				} catch (err) {
+					console.error('Failed to resume background music:', err);
+					audioState.trackAudio(backgroundMusic, false);
+				}
 			}
 		}
 	}
@@ -117,10 +150,10 @@
 	async function pauseMeditation() {
 		masterTimer.pause();
 		if ($masterTimer.isPaused) {
-			handleAudio('stop');
+			await handleAudio('stop');
 			await handleWakeLock('release');
 		} else {
-			handleAudio('resume');
+			await handleAudio('resume');
 		}
 	}
 
