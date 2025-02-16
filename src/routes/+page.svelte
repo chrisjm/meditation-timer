@@ -5,6 +5,7 @@
 	import AudioElements from '$lib/components/AudioElements.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { Cog } from 'lucide-svelte';
+	import HLSAudioPlayer from '$lib/components/HLSAudioPlayer.svelte';
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer, progress } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
@@ -19,7 +20,6 @@
 	// Audio elements
 	let startBell = $state<HTMLAudioElement | undefined>();
 	let intervalBell = $state<HTMLAudioElement | undefined>();
-	let backgroundMusic = $state<HTMLAudioElement | undefined>();
 
 	// Initialize audio event listeners
 	$effect(() => {
@@ -30,10 +30,6 @@
 		if (intervalBell) {
 			intervalBell.addEventListener('ended', () => audioState.trackAudio(intervalBell, false));
 			intervalBell.addEventListener('play', () => audioState.trackAudio(intervalBell, true));
-		}
-		if (backgroundMusic) {
-			backgroundMusic.addEventListener('play', () => audioState.trackAudio(backgroundMusic, true));
-			backgroundMusic.addEventListener('pause', () => audioState.trackAudio(backgroundMusic, false));
 		}
 	});
 
@@ -98,23 +94,14 @@
 				}
 			}
 
-			// Then start background music if enabled
-			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
-				try {
-					backgroundMusic.currentTime = 0;
-					await backgroundMusic.play();
-				} catch (err) {
-					console.error('Failed to play background music:', err);
-					audioState.trackAudio(backgroundMusic, false);
-				}
-			}
-
 			masterTimer.start($timerSettings.duration, $timerSettings.isDebugMode);
 		}
 	}
 
 	async function handleAudio(action: 'stop' | 'resume') {
-		const audioElements = [startBell, intervalBell, backgroundMusic].filter((audio): audio is HTMLAudioElement => audio !== undefined);
+		const audioElements = [startBell, intervalBell].filter(
+			(audio): audio is HTMLAudioElement => audio !== undefined
+		);
 
 		if (action === 'stop') {
 			await Promise.all(
@@ -125,14 +112,7 @@
 				})
 			);
 		} else if (action === 'resume' && !$masterTimer.isPaused) {
-			if ($timerSettings.backgroundMusicEnabled && backgroundMusic) {
-				try {
-					await backgroundMusic.play();
-				} catch (err) {
-					console.error('Failed to resume background music:', err);
-					audioState.trackAudio(backgroundMusic, false);
-				}
-			}
+			// Do nothing
 		}
 	}
 
@@ -183,14 +163,13 @@
 	>
 		<Cog class="h-6 w-6 text-gray-600 dark:text-gray-300" />
 	</button>
-	<AudioElements bind:startBell bind:intervalBell bind:backgroundMusic />
+	<AudioElements bind:startBell bind:intervalBell />
 	<SettingsPanel
 		bind:isOpen={isSettingsOpen}
-		{backgroundMusic}
 		isRunning={$masterTimer.isRunning}
+		bellSound={intervalBell}
 		on:close={() => (isSettingsOpen = false)}
 		on:intervalChange={(e) => ($timerSettings.intervalTime = e.detail)}
-		on:backgroundMusicChange={(e) => ($timerSettings.backgroundMusicEnabled = e.detail)}
 		on:bellSoundChange={(e) => ($timerSettings.bellSoundEnabled = e.detail)}
 	/>
 	<main class="mx-auto max-w-3xl text-center">
@@ -209,4 +188,7 @@
 
 		<TimerPresets duration={$timerSettings.duration} onSetDuration={setDuration} />
 	</main>
+	<div class="mx-auto mt-8 max-w-lg">
+		<HLSAudioPlayer src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8" />
+	</div>
 </div>

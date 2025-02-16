@@ -6,7 +6,7 @@
 	import StoreDebugInfo from './StoreDebugInfo.svelte';
 
 	export let isOpen = false;
-	export let backgroundMusic: HTMLAudioElement | undefined;
+	export let bellSound: HTMLAudioElement | undefined;
 	export let isRunning = false;
 
 	function handleDebugModeChange(event: Event) {
@@ -31,16 +31,6 @@
 			...settings,
 			backgroundMusicEnabled: value
 		}));
-
-		// Dynamically control background music if meditation is running
-		if (backgroundMusic && isRunning) {
-			if (value) {
-				backgroundMusic.play();
-			} else {
-				backgroundMusic.pause();
-				backgroundMusic.currentTime = 0;
-			}
-		}
 	}
 
 	function handleBellSoundChange(event: Event) {
@@ -49,6 +39,16 @@
 			...settings,
 			bellSoundEnabled: value
 		}));
+
+		// Dynamically control background music if meditation is running
+		if (bellSound && isRunning) {
+			if (value) {
+				bellSound.play();
+			} else {
+				bellSound.pause();
+				bellSound.currentTime = 0;
+			}
+		}
 	}
 </script>
 
@@ -69,13 +69,6 @@
 				<IntervalTimeInput
 					value={$timerSettings.intervalTime}
 					onChange={handleIntervalTimeChange}
-				/>
-
-				<ToggleSwitch
-					id="bgMusic"
-					checked={$timerSettings.backgroundMusicEnabled}
-					onChange={handleBackgroundMusicChange}
-					label="Background Music"
 				/>
 
 				<ToggleSwitch

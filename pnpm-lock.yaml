@@ -14,6 +14,9 @@ importers:
       drizzle-orm:
         specifier: ^0.38.4
         version: 0.38.4(@libsql/client@0.14.0)
+      hls.js:
+        specifier: ^1.5.20
+        version: 1.5.20
       lucide-svelte:
         specifier: ^0.475.0
         version: 0.475.0(svelte@5.20.0)
@@ -1652,6 +1655,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  hls.js@1.5.20:
+    resolution: {integrity: sha512-uu0VXUK52JhihhnN/MVVo1lvqNNuhoxkonqgO3IpjvQiGpJBdIXMGkofjQb/j9zvV7a1SW8U9g1FslWx/1HOiQ==}
 
   html-encoding-sniffer@4.0.0:
     resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
@@ -3887,6 +3893,8 @@ snapshots:
   graphemer@1.4.0: {}
 
   has-flag@4.0.0: {}
+
+  hls.js@1.5.20: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:

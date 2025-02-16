@@ -1,7 +1,6 @@
 <script lang="ts">
 	export let startBell: HTMLAudioElement | undefined;
 	export let intervalBell: HTMLAudioElement | undefined;
-	export let backgroundMusic: HTMLAudioElement | undefined;
 </script>
 
 <audio
@@ -13,10 +12,4 @@
 	bind:this={intervalBell}
 	src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-bell.mp3"
 	preload="auto"
-></audio>
-<audio
-	bind:this={backgroundMusic}
-	src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus.ogg"
-	preload="auto"
-	loop
 ></audio>
