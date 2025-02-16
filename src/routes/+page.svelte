@@ -41,10 +41,21 @@
 		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled && intervalBell) {
 			// Reset and play the interval bell
 			intervalBell.currentTime = 0;
-			intervalBell.play().catch((err) => {
-				console.error('Failed to play interval bell:', err);
-				audioState.trackAudio(intervalBell, false);
-			});
+
+			// Create a promise that resolves when the audio is ready
+			const playWhenReady = async () => {
+				try {
+					// First try to load the audio
+					await intervalBell?.load();
+					// Then try to play it
+					await intervalBell?.play();
+				} catch (err) {
+					console.error('Failed to play interval bell:', err);
+					audioState.trackAudio(intervalBell, false);
+				}
+			};
+
+			playWhenReady();
 		}
 	});
 
@@ -89,11 +100,14 @@
 			// Play start bell first if enabled
 			if ($timerSettings.bellSoundEnabled && startBell) {
 				try {
+					// First try to load the audio
+					await startBell.load();
 					startBell.currentTime = 0;
 					await startBell.play();
 				} catch (err) {
 					console.error('Failed to play start bell:', err);
 					audioState.trackAudio(startBell, false);
+					// Continue with meditation even if bell fails
 				}
 			}
 
@@ -179,11 +193,7 @@
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
 
-		<TimerDisplay 
-			progress={$progress} 
-			time={$masterTimer.currentTime}
-			isBellPlaying={isBellPlaying}
-		/>
+		<TimerDisplay progress={$progress} time={$masterTimer.currentTime} {isBellPlaying} />
 
 		<TimerControls
 			isRunning={$masterTimer.isRunning}
@@ -196,6 +206,8 @@
 		<TimerPresets duration={$timerSettings.duration} onSetDuration={setDuration} />
 	</main>
 	<div class="mx-auto mt-8 max-w-lg">
-		<HLSAudioPlayer src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8" />
+		<HLSAudioPlayer
+			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
+		/>
 	</div>
 </div>
