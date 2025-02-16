@@ -3,7 +3,11 @@
 	import { onDestroy } from 'svelte';
 	import { Play, Pause, Volume2, VolumeX } from 'lucide-svelte';
 
-	const { src, preload = 'auto', loop = false } = $props<{
+	const {
+		src,
+		preload = 'auto',
+		loop = false
+	} = $props<{
 		src: string;
 		preload?: string;
 		loop?: boolean;
@@ -103,8 +107,8 @@
 
 	$effect(() => {
 		if (!audioElement) return;
-		audioElement.addEventListener('play', () => isPlaying = true);
-		audioElement.addEventListener('pause', () => isPlaying = false);
+		audioElement.addEventListener('play', () => (isPlaying = true));
+		audioElement.addEventListener('pause', () => (isPlaying = false));
 		audioElement.addEventListener('timeupdate', handleTimeUpdate);
 		audioElement.addEventListener('durationchange', handleDurationChange);
 	});
@@ -112,8 +116,8 @@
 	onDestroy(() => {
 		destroyHls();
 		if (audioElement) {
-			audioElement.removeEventListener('play', () => isPlaying = true);
-			audioElement.removeEventListener('pause', () => isPlaying = false);
+			audioElement.removeEventListener('play', () => (isPlaying = true));
+			audioElement.removeEventListener('pause', () => (isPlaying = false));
 			audioElement.removeEventListener('timeupdate', handleTimeUpdate);
 			audioElement.removeEventListener('durationchange', handleDurationChange);
 		}
@@ -143,52 +147,47 @@
 </script>
 
 <div class="w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg dark:bg-slate-800">
-	<audio
-		bind:this={audioElement}
-		{preload}
-		{loop}
-		class="hidden"
-	></audio>
+	<audio bind:this={audioElement} {preload} {loop} class="hidden"></audio>
 	<div class="flex flex-col gap-4">
 		<!-- Time slider -->
 		<div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-			<span>{formatTime(currentTime)}</span>
+			<span class="w-10">{formatTime(currentTime)}</span>
 			<input
 				type="range"
 				min="0"
 				max={duration || 100}
 				value={currentTime}
 				oninput={handleSeek}
-				class="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-slate-700"
+				class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
 			/>
-			<span>{formatTime(duration || 0)}</span>
+			<span class="w-10">{formatTime(duration || 0)}</span>
 		</div>
 
 		<!-- Controls -->
-		<div class="flex items-center justify-between">
-			<div class="flex items-center gap-4">
+		<div class="flex items-center">
+			<div class="flex w-full items-center justify-between gap-4">
 				<button
 					onclick={handlePlayPause}
-					class="rounded-full p-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+					class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
 					aria-label={isPlaying ? 'Pause' : 'Play'}
 				>
 					{#if isPlaying}
-						<Pause class="w-6 h-6 text-slate-700 dark:text-slate-200" />
+						<Pause class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 					{:else}
-						<Play class="w-6 h-6 text-slate-700 dark:text-slate-200" />
+						<Play class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 					{/if}
 				</button>
 
 				<div class="flex items-center gap-2">
 					<button
 						onclick={handleVolumeToggle}
-						class="rounded-full p-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+						class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
 						aria-label={isMuted ? 'Unmute' : 'Mute'}
 					>
 						{#if isMuted}
-							<VolumeX class="w-6 h-6 text-slate-700 dark:text-slate-200" />
+							<VolumeX class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 						{:else}
-							<Volume2 class="w-6 h-6 text-slate-700 dark:text-slate-200" />
+							<Volume2 class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 						{/if}
 					</button>
 					<input
@@ -198,7 +197,7 @@
 						step="0.1"
 						value={volume}
 						oninput={handleVolumeChange}
-						class="w-24 h-2 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-slate-700"
+						class="h-2 w-24 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
 					/>
 				</div>
 			</div>

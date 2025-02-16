@@ -28,7 +28,7 @@
 	>
 		<h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Debug</h3>
 		<svg
-			class="h-5 w-5 transform transition-transform duration-200 {isExpanded ? 'rotate-180' : ''}"
+			class="h-5 w-5 transform transition-transform duration-200 text-slate-900 dark:text-slate-300 {isExpanded ? 'rotate-180' : ''}"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -44,12 +44,22 @@
 		>
 			<div>
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Timer Settings:</h4>
-				<pre class="mt-2 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300">{JSON.stringify($timerSettings, null, 2)}</pre>
+				<pre
+					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
+						$timerSettings,
+						null,
+						2
+					)}</pre>
 			</div>
 
 			<div>
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Master Timer:</h4>
-				<pre class="mt-2 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300">{JSON.stringify($masterTimer, null, 2)}</pre>
+				<pre
+					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
+						$masterTimer,
+						null,
+						2
+					)}</pre>
 			</div>
 		</div>
 	{/if}

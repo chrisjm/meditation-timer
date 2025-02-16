@@ -22,11 +22,11 @@
 			tabindex="0"
 		/>
 		<div
-			class="relative h-6 w-11 rounded-full transition-colors duration-200 ease-in-out focus-within:ring-4 focus-within:ring-blue-300 dark:bg-gray-700 dark:focus-within:ring-blue-800"
+			class="relative h-6 w-11 rounded-full transition-colors duration-200 ease-in-out focus-within:ring-4 focus-within:ring-blue-300 dark:focus-within:ring-blue-800"
 			class:bg-blue-600={checked}
 			class:bg-gray-200={!checked}
 			class:dark:bg-blue-500={checked}
-			class:dark:bg-gray-800={!checked}
+			class:dark:bg-gray-600={!checked}
 		>
 			<div
 				class="absolute h-5 w-5 transform rounded-full border bg-white transition-transform duration-200 ease-in-out dark:border-gray-600"
