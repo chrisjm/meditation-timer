@@ -11,6 +11,9 @@
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audioState } from '$lib/stores/audioState';
 
+	// Computed state for bell playing status
+	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
+
 	// Screen wake lock
 	let wakeLock = $state<WakeLockSentinel | null>(null);
 
@@ -176,7 +179,11 @@
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
 
-		<TimerDisplay progress={$progress} time={$masterTimer.currentTime} />
+		<TimerDisplay 
+			progress={$progress} 
+			time={$masterTimer.currentTime}
+			isBellPlaying={isBellPlaying}
+		/>
 
 		<TimerControls
 			isRunning={$masterTimer.isRunning}
