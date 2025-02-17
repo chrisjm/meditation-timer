@@ -209,13 +209,23 @@
 		<HLSAudioPlayer
 			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
 			segments={[
-				{ color: '#FF0000', length: 900, tooltip: '15 minutes' },
-				{ color: '#FF7F00', length: 900, tooltip: '30 minutes' },
-				{ color: '#FFFF00', length: 900, tooltip: '45 minutes' },
-				{ color: '#00FF00', length: 900, tooltip: '60 minutes' },
-				{ color: '#0000FF', length: 900, tooltip: '75 minutes' },
-				{ color: '#4B0082', length: 900, tooltip: '90 minutes' },
-				{ color: '#9400D3', length: 900, tooltip: '105 minutes' },
+				{ color: '#FF0000', length: 540, description: '174 Hz - Comfort and Security' },
+				{ color: '#FF4500', length: 540, description: '285 Hz - Healing and Rejuvenation' },
+				{ color: '#FFA500', length: 540, description: '396 Hz - Liberating Guilt and Fear' },
+				{
+					color: '#FFD700',
+					length: 540,
+					description: '417 Hz - Undoing Situations and Facilitating Change'
+				},
+				{
+					color: '#32CD32',
+					length: 540,
+					description: '528 Hz - Transformation and Miracles (DNA Repair)'
+				},
+				{ color: '#4169E1', length: 540, description: '639 Hz - Connecting/Relationships' },
+				{ color: '#4B0082', length: 540, description: '741 Hz - Expression/Solutions' },
+				{ color: '#8A2BE2', length: 540, description: '852 Hz – Returning to Spiritual Order' },
+				{ color: '#9932CC', length: 540, description: '963 Hz – Intuitive Awakening' }
 			]}
 		/>
 	</div>
