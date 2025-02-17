@@ -1,38 +1,39 @@
-# sv
+# Meditation Timer
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A beautiful and minimal meditation timer built with SvelteKit to help you focus on your practice. Features ambient sounds, interval bells, and customizable meditation sessions.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Clean, distraction-free interface
+- Customizable meditation duration
+- Ambient background sounds
+- Interval bells for mindfulness
+- Progressive web app (PWA) support
+- Dark mode support
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Development
 
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+This project uses pnpm as the package manager. To get started:
 
 ```bash
-npm run dev
+# Install dependencies
+pnpm install
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+# Start development server
+pnpm dev
 
-## Building
+# Build for production
+pnpm build
 
-To create a production version of your app:
+## Credits and Attribution
 
-```bash
-npm run build
-```
+### Audio
+- Bell sounds: [Freesound.org](https://freesound.org) (CC0 License)
+- Solfeggio frequencies: uncredited (soon to be replaced with original frequencies)
 
-You can preview the production build with `npm run preview`.
+### Images
+- Stability AI
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## License
+
+MIT License - See LICENSE file for details
