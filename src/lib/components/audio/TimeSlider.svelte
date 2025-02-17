@@ -53,7 +53,7 @@
 		<div class="relative flex-1">
 			<!-- Segments bar -->
 			<div
-				class="absolute top-1/3 left-0 h-2 w-full -translate-y-1/3 overflow-hidden rounded-lg"
+				class="absolute top-1.5 left-0 h-2 w-full overflow-hidden rounded-lg"
 				role="presentation"
 			>
 				<div class="flex h-full w-full">
@@ -72,7 +72,7 @@
 				max={duration || 100}
 				value={currentTime}
 				oninput={handleSliderChange}
-				class="relative h-2 w-full cursor-pointer appearance-none bg-transparent"
+				class="range relative h-2 w-full cursor-pointer appearance-none bg-transparent accent-slate-300 hover:accent-slate-600"
 				aria-label="Time slider"
 				tabindex="0"
 			/>
