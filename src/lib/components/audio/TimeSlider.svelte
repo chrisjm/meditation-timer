@@ -1,26 +1,86 @@
 <script lang="ts">
-	const { currentTime, duration, seek } = $props<{
+	export interface Segment {
+		color: string;
+		length: number;
+		description: string;
+		startTime?: number; // Calculated internally
+	}
+
+	const { currentTime, duration, seek, segments } = $props<{
 		currentTime: number;
 		duration: number;
 		seek: (seconds: number) => void;
+		segments?: Segment[];
 	}>();
+
+	// Calculate segment positions
+	let processedSegments = $derived(
+		segments.map((segment: Segment, index: number) => ({
+			...segment,
+			color: segment.color,
+			startTime: segments
+				.slice(0, index)
+				.reduce((acc: number, curr: Segment) => acc + curr.length, 0)
+		}))
+	);
 
 	function formatTime(seconds: number): string {
 		const minutes = Math.floor(seconds / 60);
 		const remainingSeconds = Math.floor(seconds % 60);
 		return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 	}
+
+	function handleSliderChange(e: Event) {
+		const target = e.target as HTMLInputElement;
+		seek(Number(target.value));
+	}
+
+	function getSegmentWidth(length: number): string {
+		return `${(length / duration) * 100}%`;
+	}
+
+	function getCurrentSegment(): Segment | undefined {
+		return processedSegments.find(
+			(segment: Segment) =>
+				currentTime >= segment.startTime! && currentTime < segment.startTime! + segment.length
+		);
+	}
 </script>
 
-<div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-	<span class="w-10">{formatTime(currentTime)}</span>
-	<input
-		type="range"
-		min="0"
-		max={duration || 100}
-		value={currentTime}
-		oninput={(e) => seek(Number((e.target as HTMLInputElement).value))}
-		class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
-	/>
-	<span class="w-10">{formatTime(duration || 0)}</span>
+<div class="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-300">
+	<div class="flex items-center gap-2">
+		<span class="w-10">{formatTime(currentTime)}</span>
+		<div class="relative flex-1">
+			<!-- Segments bar -->
+			<div
+				class="absolute top-1/3 left-0 h-2 w-full -translate-y-1/3 overflow-hidden rounded-lg"
+				role="presentation"
+			>
+				<div class="flex h-full w-full">
+					{#each processedSegments as segment}
+						<div
+							class="relative h-full"
+							style="width: {getSegmentWidth(segment.length)}; background-color: {segment.color}"
+						></div>
+					{/each}
+				</div>
+			</div>
+			<!-- Slider input -->
+			<input
+				type="range"
+				min="0"
+				max={duration || 100}
+				value={currentTime}
+				oninput={handleSliderChange}
+				class="relative h-2 w-full cursor-pointer appearance-none bg-transparent"
+				aria-label="Time slider"
+				tabindex="0"
+			/>
+		</div>
+		<span class="w-10">{formatTime(duration || 0)}</span>
+	</div>
+	<!-- Current segment description -->
+	{#if getCurrentSegment()}
+		<p class="text-center text-xs">{getCurrentSegment()?.description}</p>
+	{/if}
 </div>

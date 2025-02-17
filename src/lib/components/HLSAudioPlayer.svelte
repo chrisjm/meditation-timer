@@ -1,18 +1,20 @@
 <script lang="ts">
 	import Hls from 'hls.js';
 	import { onDestroy } from 'svelte';
-	import TimeSlider from './audio/TimeSlider.svelte';
+	import TimeSlider, { type Segment } from './audio/TimeSlider.svelte';
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
 
 	const {
 		src,
 		preload = 'auto',
-		loop = false
+		loop = false,
+		segments = [] as Segment[]
 	} = $props<{
 		src: string;
 		preload?: string;
 		loop?: boolean;
+		segments?: Segment[];
 	}>();
 
 	let audioElement: HTMLAudioElement | undefined;
@@ -142,7 +144,7 @@
 <div class="w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg dark:bg-slate-800">
 	<audio bind:this={audioElement} {preload} {loop} class="hidden"></audio>
 	<div class="flex flex-col gap-4">
-		<TimeSlider {currentTime} {duration} seek={handleSeek} />
+		<TimeSlider {currentTime} {duration} seek={handleSeek} segments={segments} />
 
 		<div class="flex items-center">
 			<div class="flex w-full items-center justify-between gap-4">
