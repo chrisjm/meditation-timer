@@ -208,6 +208,15 @@
 	<div class="mx-auto mt-8 max-w-lg">
 		<HLSAudioPlayer
 			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
+			segments={[
+				{ color: '#FF0000', length: 900, tooltip: '15 minutes' },
+				{ color: '#FF7F00', length: 900, tooltip: '30 minutes' },
+				{ color: '#FFFF00', length: 900, tooltip: '45 minutes' },
+				{ color: '#00FF00', length: 900, tooltip: '60 minutes' },
+				{ color: '#0000FF', length: 900, tooltip: '75 minutes' },
+				{ color: '#4B0082', length: 900, tooltip: '90 minutes' },
+				{ color: '#9400D3', length: 900, tooltip: '105 minutes' },
+			]}
 		/>
 	</div>
 </div>
