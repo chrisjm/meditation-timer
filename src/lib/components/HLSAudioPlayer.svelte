@@ -1,7 +1,9 @@
 <script lang="ts">
 	import Hls from 'hls.js';
 	import { onDestroy } from 'svelte';
-	import { Play, Pause, Volume2, VolumeX } from 'lucide-svelte';
+	import TimeSlider from './audio/TimeSlider.svelte';
+	import PlayPauseButton from './audio/PlayPauseButton.svelte';
+	import VolumeControl from './audio/VolumeControl.svelte';
 
 	const {
 		src,
@@ -20,12 +22,6 @@
 	let currentTime = $state(0);
 	let duration = $state(0);
 	let volume = $state(1);
-
-	function formatTime(seconds: number): string {
-		const minutes = Math.floor(seconds / 60);
-		const remainingSeconds = Math.floor(seconds % 60);
-		return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-	}
 
 	$effect(() => {
 		if (!audioElement) return;
@@ -92,16 +88,13 @@
 		duration = audioElement.duration;
 	}
 
-	function handleSeek(e: Event) {
+	function handleSeek(seconds: number) {
 		if (!audioElement) return;
-		const target = e.target as HTMLInputElement;
-		audioElement.currentTime = Number(target.value);
+		audioElement.currentTime = seconds;
 	}
 
-	function handleVolumeChange(e: Event) {
+	function handleVolumeChange(volume: number) {
 		if (!audioElement) return;
-		const target = e.target as HTMLInputElement;
-		volume = Number(target.value);
 		audioElement.volume = volume;
 	}
 
@@ -149,57 +142,17 @@
 <div class="w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg dark:bg-slate-800">
 	<audio bind:this={audioElement} {preload} {loop} class="hidden"></audio>
 	<div class="flex flex-col gap-4">
-		<!-- Time slider -->
-		<div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-			<span class="w-10">{formatTime(currentTime)}</span>
-			<input
-				type="range"
-				min="0"
-				max={duration || 100}
-				value={currentTime}
-				oninput={handleSeek}
-				class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
-			/>
-			<span class="w-10">{formatTime(duration || 0)}</span>
-		</div>
+		<TimeSlider {currentTime} {duration} seek={handleSeek} />
 
-		<!-- Controls -->
 		<div class="flex items-center">
 			<div class="flex w-full items-center justify-between gap-4">
-				<button
-					onclick={handlePlayPause}
-					class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
-					aria-label={isPlaying ? 'Pause' : 'Play'}
-				>
-					{#if isPlaying}
-						<Pause class="h-6 w-6 text-slate-700 dark:text-slate-200" />
-					{:else}
-						<Play class="h-6 w-6 text-slate-700 dark:text-slate-200" />
-					{/if}
-				</button>
-
-				<div class="flex items-center gap-2">
-					<button
-						onclick={handleVolumeToggle}
-						class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
-						aria-label={isMuted ? 'Unmute' : 'Mute'}
-					>
-						{#if isMuted}
-							<VolumeX class="h-6 w-6 text-slate-700 dark:text-slate-200" />
-						{:else}
-							<Volume2 class="h-6 w-6 text-slate-700 dark:text-slate-200" />
-						{/if}
-					</button>
-					<input
-						type="range"
-						min="0"
-						max="1"
-						step="0.1"
-						value={volume}
-						oninput={handleVolumeChange}
-						class="h-2 w-24 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
-					/>
-				</div>
+				<PlayPauseButton {isPlaying} playToggle={handlePlayPause} />
+				<VolumeControl
+					{volume}
+					{isMuted}
+					volumeChange={handleVolumeChange}
+					muteToggle={handleVolumeToggle}
+				/>
 			</div>
 		</div>
 	</div>
