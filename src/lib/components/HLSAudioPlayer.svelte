@@ -68,6 +68,8 @@
 	$effect(() => {
 		if (!audioElement) return;
 
+		audioControl.setAudioElement(audioElement);
+
 		if (Hls.isSupported()) {
 			hls = new Hls({
 				enableWorker: true,
@@ -111,6 +113,7 @@
 
 	onDestroy(() => {
 		destroyHls();
+		audioControl.setAudioElement(undefined);
 		audioControl.reset();
 	});
 </script>

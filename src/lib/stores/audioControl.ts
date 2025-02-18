@@ -4,6 +4,7 @@ interface AudioControl {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  audioElement?: HTMLAudioElement;
 }
 
 const createAudioControl = () => {
@@ -11,14 +12,37 @@ const createAudioControl = () => {
     isPlaying: false,
     currentTime: 0,
     duration: 0,
+    audioElement: undefined,
+  });
+
+  let state: AudioControl;
+  subscribe(value => {
+    state = value;
   });
 
   return {
     subscribe,
-    setPlaying: (isPlaying: boolean) => update(state => ({ ...state, isPlaying })),
+    setAudioElement: (element: HTMLAudioElement | undefined) =>
+      update(state => ({ ...state, audioElement: element })),
+    setPlaying: (isPlaying: boolean) => {
+      if (state.audioElement) {
+        if (isPlaying) {
+          state.audioElement.play();
+        } else {
+          state.audioElement.pause();
+        }
+      }
+      return update(state => ({ ...state, isPlaying }));
+    },
     setTime: (currentTime: number) => update(state => ({ ...state, currentTime })),
     setDuration: (duration: number) => update(state => ({ ...state, duration })),
-    reset: () => set({ isPlaying: false, currentTime: 0, duration: 0 }),
+    reset: () => {
+      if (state.audioElement) {
+        state.audioElement.pause();
+        state.audioElement.currentTime = 0;
+      }
+      set({ isPlaying: false, currentTime: 0, duration: 0, audioElement: state.audioElement });
+    },
   };
 };
 
