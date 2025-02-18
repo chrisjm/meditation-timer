@@ -9,24 +9,27 @@
 <div class="mb-8 space-x-4">
 	{#if !isRunning}
 		<button
-			on:click={onStart}
+			onclick={onStart}
 			class="rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white
 				transition-colors duration-200 hover:bg-emerald-600"
+			aria-label="Start meditation"
 		>
 			Start
 		</button>
 	{:else}
 		<button
-			on:click={onPause}
+			onclick={onPause}
 			class="rounded-lg bg-amber-500 px-6 py-2 font-medium text-white
 				transition-colors duration-200 hover:bg-amber-600"
+			aria-label={isPaused ? 'Resume meditation' : 'Pause meditation'}
 		>
 			{isPaused ? 'Resume' : 'Pause'}
 		</button>
 		<button
-			on:click={onReset}
+			onclick={onReset}
 			class="rounded-lg bg-rose-500 px-6 py-2 font-medium text-white
 				transition-colors duration-200 hover:bg-rose-600"
+			aria-label="Reset meditation timer"
 		>
 			Reset
 		</button>

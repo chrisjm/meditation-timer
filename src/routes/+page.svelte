@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Modal from '$lib/components/Modal.svelte';
+	import { modalStore } from '$lib/stores/modal';
 	import TimerDisplay from '$lib/components/TimerDisplay.svelte';
 	import TimerControls from '$lib/components/TimerControls.svelte';
 	import TimerPresets from '$lib/components/TimerPresets.svelte';
@@ -10,6 +12,7 @@
 	import { masterTimer, progress } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audioState } from '$lib/stores/audioState';
+	import { audioControl } from '$lib/stores/audioControl';
 
 	// Computed state for bell playing status
 	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
@@ -76,6 +79,9 @@
 
 		await handleWakeLock('release');
 		masterTimer.reset();
+
+		// Show completion modal
+		modalStore.open("Great job! You've completed your meditation session.");
 	}
 
 	// Handle meditation stop without final bell
@@ -170,6 +176,13 @@
 			masterTimer.reset();
 		}
 	}
+
+	const handleCloseModal = async () => {
+		if ($audioControl.isPlaying) {
+			audioControl.setPlaying(false);
+		}
+		modalStore.close();
+	};
 </script>
 
 <div class="relative min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
@@ -230,3 +243,17 @@
 		/>
 	</div>
 </div>
+
+<Modal isOpen={$modalStore.isOpen} title="Meditation Complete" close={handleCloseModal}>
+	<div class="space-y-4 text-center">
+		<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
+		<button
+			onclick={handleCloseModal}
+			class="rounded-lg bg-purple-500 px-6 py-2 font-medium text-white
+				transition-colors duration-200 hover:bg-purple-600"
+			aria-label="Close meditation complete dialog"
+		>
+			Finish Meditation
+		</button>
+	</div>
+</Modal>
