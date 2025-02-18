@@ -12,6 +12,7 @@
 	import { masterTimer, progress } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audioState } from '$lib/stores/audioState';
+	import { audioControl } from '$lib/stores/audioControl';
 
 	// Computed state for bell playing status
 	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
@@ -78,6 +79,9 @@
 
 		await handleWakeLock('release');
 		masterTimer.reset();
+
+		// Show completion modal
+		modalStore.open("Great job! You've completed your meditation session.");
 	}
 
 	// Handle meditation stop without final bell
@@ -173,14 +177,11 @@
 		}
 	}
 
-	const handleFinish = () => {
-		$modalStore.isOpen = true;
-		$modalStore.message = 'Meditation complete!';
-	};
-
-	const handleCloseModal = () => {
+	const handleCloseModal = async () => {
+		if ($audioControl.isPlaying) {
+			audioControl.setPlaying(false);
+		}
 		modalStore.close();
-		handleFinish();
 	};
 </script>
 
@@ -244,14 +245,15 @@
 </div>
 
 <Modal isOpen={$modalStore.isOpen} title="Meditation Complete" close={handleCloseModal}>
-	<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
-
-	<button
-		onclick={handleFinish}
-		class="rounded-lg bg-purple-500 px-6 py-2 font-medium text-white
+	<div class="space-y-4 text-center">
+		<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
+		<button
+			onclick={handleCloseModal}
+			class="rounded-lg bg-purple-500 px-6 py-2 font-medium text-white
 				transition-colors duration-200 hover:bg-purple-600"
-		aria-label="Finish meditation"
-	>
-		Finish
-	</button>
+			aria-label="Close meditation complete dialog"
+		>
+			Finish Meditation
+		</button>
+	</div>
 </Modal>

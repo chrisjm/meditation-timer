@@ -4,6 +4,7 @@
 	import TimeSlider, { type Segment } from './audio/TimeSlider.svelte';
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
+	import { audioControl } from '$lib/stores/audioControl';
 
 	const {
 		src,
@@ -19,12 +20,51 @@
 
 	let audioElement: HTMLAudioElement | undefined;
 	let hls: Hls | undefined;
-	let isPlaying = $state(false);
 	let isMuted = $state(false);
-	let currentTime = $state(0);
-	let duration = $state(0);
 	let volume = $state(1);
 
+	// Handle audio element events
+	const handlePlay = () => audioControl.setPlaying(true);
+	const handlePause = () => audioControl.setPlaying(false);
+	const handleTimeUpdate = () => {
+		if (audioElement) {
+			audioControl.setTime(audioElement.currentTime);
+		}
+	};
+	const handleDurationChange = () => {
+		if (audioElement) {
+			audioControl.setDuration(audioElement.duration);
+		}
+	};
+
+	// Audio control methods
+	const handlePlayPause = () => {
+		if (!audioElement) return;
+		if ($audioControl.isPlaying) {
+			audioElement.pause();
+		} else {
+			audioElement.play();
+		}
+	};
+
+	const handleVolumeToggle = () => {
+		if (!audioElement) return;
+		isMuted = !isMuted;
+		audioElement.muted = isMuted;
+	};
+
+	const handleSeek = (seconds: number) => {
+		if (!audioElement) return;
+		audioElement.currentTime = seconds;
+	};
+
+	const handleVolumeChange = (newVolume: number) => {
+		if (!audioElement) return;
+		volume = newVolume;
+		audioElement.volume = volume;
+	};
+
+	// Initialize HLS
 	$effect(() => {
 		if (!audioElement) return;
 
@@ -43,7 +83,6 @@
 				if (data.fatal) {
 					switch (data.type) {
 						case Hls.ErrorTypes.NETWORK_ERROR:
-							// try to recover network error
 							console.log('fatal network error encountered, trying to recover');
 							hls?.startLoad();
 							break;
@@ -52,7 +91,6 @@
 							hls?.recoverMediaError();
 							break;
 						default:
-							// cannot recover
 							console.error('Fatal error, destroying HLS instance');
 							destroyHls();
 							break;
@@ -60,100 +98,51 @@
 				}
 			});
 		} else if (audioElement.canPlayType('application/vnd.apple.mpegurl')) {
-			// For Safari, which has native HLS support
 			audioElement.src = src;
 		}
 	});
 
-	function handlePlayPause() {
-		if (!audioElement) return;
-		if (isPlaying) {
-			audioElement.pause();
-		} else {
-			audioElement.play();
-		}
-	}
-
-	function handleVolumeToggle() {
-		if (!audioElement) return;
-		isMuted = !isMuted;
-		audioElement.muted = isMuted;
-	}
-
-	function handleTimeUpdate() {
-		if (!audioElement) return;
-		currentTime = audioElement.currentTime;
-	}
-
-	function handleDurationChange() {
-		if (!audioElement) return;
-		duration = audioElement.duration;
-	}
-
-	function handleSeek(seconds: number) {
-		if (!audioElement) return;
-		audioElement.currentTime = seconds;
-	}
-
-	function handleVolumeChange(volume: number) {
-		if (!audioElement) return;
-		audioElement.volume = volume;
-	}
-
-	$effect(() => {
-		if (!audioElement) return;
-		audioElement.addEventListener('play', () => (isPlaying = true));
-		audioElement.addEventListener('pause', () => (isPlaying = false));
-		audioElement.addEventListener('timeupdate', handleTimeUpdate);
-		audioElement.addEventListener('durationchange', handleDurationChange);
-	});
-
-	onDestroy(() => {
-		destroyHls();
-		if (audioElement) {
-			audioElement.removeEventListener('play', () => (isPlaying = true));
-			audioElement.removeEventListener('pause', () => (isPlaying = false));
-			audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-			audioElement.removeEventListener('durationchange', handleDurationChange);
-		}
-	});
-
-	function destroyHls() {
+	const destroyHls = () => {
 		if (hls) {
 			hls.destroy();
 			hls = undefined;
 		}
-	}
+	};
 
-	export function play() {
-		audioElement?.play();
-	}
-
-	export function pause() {
-		audioElement?.pause();
-	}
-
-	export function stop() {
-		if (audioElement) {
-			audioElement.pause();
-			audioElement.currentTime = 0;
-		}
-	}
+	onDestroy(() => {
+		destroyHls();
+		audioControl.reset();
+	});
 </script>
 
 <div class="w-full max-w-2xl rounded-lg bg-white p-4 shadow-lg dark:bg-slate-800">
-	<audio bind:this={audioElement} {preload} {loop} class="hidden"></audio>
+	<audio
+		bind:this={audioElement}
+		{preload}
+		{loop}
+		onplay={handlePlay}
+		onpause={handlePause}
+		ontimeupdate={handleTimeUpdate}
+		ondurationchange={handleDurationChange}
+		class="hidden"
+	></audio>
+
 	<div class="flex flex-col gap-4">
-		<TimeSlider {currentTime} {duration} seek={handleSeek} segments={segments} />
+		<TimeSlider
+			currentTime={$audioControl.currentTime}
+			duration={$audioControl.duration}
+			{segments}
+			seek={handleSeek}
+		/>
 
 		<div class="flex items-center">
 			<div class="flex w-full items-center justify-between gap-4">
-				<PlayPauseButton {isPlaying} playToggle={handlePlayPause} />
+				<PlayPauseButton isPlaying={$audioControl.isPlaying} playToggle={handlePlayPause} />
 				<VolumeControl
-					{volume}
 					{isMuted}
-					volumeChange={handleVolumeChange}
+					{volume}
 					muteToggle={handleVolumeToggle}
+					volumeChange={handleVolumeChange}
 				/>
 			</div>
 		</div>
