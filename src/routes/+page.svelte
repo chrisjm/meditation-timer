@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Modal from '$lib/components/Modal.svelte';
+	import { modalStore } from '$lib/stores/modal';
 	import TimerDisplay from '$lib/components/TimerDisplay.svelte';
 	import TimerControls from '$lib/components/TimerControls.svelte';
 	import TimerPresets from '$lib/components/TimerPresets.svelte';
@@ -170,6 +172,16 @@
 			masterTimer.reset();
 		}
 	}
+
+	const handleFinish = () => {
+		$modalStore.isOpen = true;
+		$modalStore.message = 'Meditation complete!';
+	};
+
+	const handleCloseModal = () => {
+		modalStore.close();
+		handleFinish();
+	};
 </script>
 
 <div class="relative min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-900">
@@ -230,3 +242,16 @@
 		/>
 	</div>
 </div>
+
+<Modal isOpen={$modalStore.isOpen} title="Meditation Complete" close={handleCloseModal}>
+	<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
+
+	<button
+		onclick={handleFinish}
+		class="rounded-lg bg-purple-500 px-6 py-2 font-medium text-white
+				transition-colors duration-200 hover:bg-purple-600"
+		aria-label="Finish meditation"
+	>
+		Finish
+	</button>
+</Modal>
