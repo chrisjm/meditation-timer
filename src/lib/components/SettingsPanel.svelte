@@ -87,8 +87,8 @@
 							label="Debug Mode (10x faster)"
 						/>
 					</div>
+					<StoreDebugInfo />
 				{/if}
-				<StoreDebugInfo />
 			</div>
 		</div>
 	</div>
