@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer } from '$lib/stores/masterTimer';
+	import { audioControl } from '$lib/stores/audioControl';
+	import { audioState } from '$lib/stores/audioState';
+	import { modalStore } from '$lib/stores/modal';
 
 	let isExpanded = false;
 
@@ -16,19 +19,21 @@
 	};
 </script>
 
-<div class="mt-8 border-t border-slate-200 pt-4 dark:border-slate-700">
+<div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
 	<button
 		type="button"
-		class="flex w-full items-center justify-between rounded-lg px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800"
+		class="flex w-full items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
 		on:click={handleToggle}
 		on:keydown={handleKeyDown}
 		aria-expanded={isExpanded}
 		aria-controls="debug-content"
 		tabindex="0"
 	>
-		<h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Debug</h3>
+		<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Debug</span>
 		<svg
-			class="h-5 w-5 transform transition-transform duration-200 text-slate-900 dark:text-slate-300 {isExpanded ? 'rotate-180' : ''}"
+			class="h-5 w-5 transform text-gray-700 transition-transform duration-200 dark:text-gray-300 {isExpanded
+				? 'rotate-180'
+				: ''}"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -40,7 +45,7 @@
 	{#if isExpanded}
 		<div
 			id="debug-content"
-			class="mt-4 space-y-4 rounded-lg bg-slate-100 p-4 font-mono text-sm dark:bg-slate-900"
+			class="mt-4 space-y-4 rounded-lg bg-gray-100 p-4 font-mono text-sm dark:bg-gray-900 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
 		>
 			<div>
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Timer Settings:</h4>
@@ -57,6 +62,36 @@
 				<pre
 					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
 						$masterTimer,
+						null,
+						2
+					)}</pre>
+			</div>
+
+			<div>
+				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio Control:</h4>
+				<pre
+					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
+						{ ...$audioControl, audioElement: $audioControl.audioElement ? '[HTMLAudioElement]' : undefined },
+						null,
+						2
+					)}</pre>
+			</div>
+
+			<div>
+				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio State:</h4>
+				<pre
+					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
+						{ activeAudio: Array.from($audioState.activeAudio).map(() => '[HTMLAudioElement]') },
+						null,
+						2
+					)}</pre>
+			</div>
+
+			<div>
+				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Modal Store:</h4>
+				<pre
+					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
+						$modalStore,
 						null,
 						2
 					)}</pre>

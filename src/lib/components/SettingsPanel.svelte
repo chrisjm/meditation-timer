@@ -88,9 +88,8 @@
 						/>
 					</div>
 				{/if}
+				<StoreDebugInfo />
 			</div>
-
-			<StoreDebugInfo />
 		</div>
 	</div>
 {/if}
