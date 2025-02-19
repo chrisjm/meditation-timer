@@ -3,16 +3,20 @@ import { writable } from 'svelte/store';
 interface TimerSettings {
     duration: number;
     intervalTime: number;
-    backgroundMusicEnabled: boolean;
-    bellSoundEnabled: boolean;
+    startStopBellEnabled: boolean;
+    startStopBellVolume: number;
+    intervalBellEnabled: boolean;
+    intervalBellVolume: number;
     isDebugMode: boolean;
 }
 
 const defaultSettings: TimerSettings = {
     duration: 600,
     intervalTime: 120,
-    backgroundMusicEnabled: true,
-    bellSoundEnabled: true,
+    startStopBellEnabled: true,
+    startStopBellVolume: 0.7,
+    intervalBellEnabled: true,
+    intervalBellVolume: 0.7,
     isDebugMode: false,
 };
 

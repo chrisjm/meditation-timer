@@ -2,12 +2,11 @@
 	import { X } from 'lucide-svelte';
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import ToggleSwitch from './ToggleSwitch.svelte';
+	import VolumeSlider from './VolumeSlider.svelte';
 	import IntervalTimeInput from './IntervalTimeInput.svelte';
 	import StoreDebugInfo from './StoreDebugInfo.svelte';
 
-	export let isOpen = false;
-	export let bellSound: HTMLAudioElement | undefined;
-	export let isRunning = false;
+	let { isOpen } = $props();
 
 	function handleDebugModeChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
@@ -25,30 +24,36 @@
 		}));
 	}
 
-	function handleBackgroundMusicChange(event: Event) {
+	function handleStartStopBellChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
-			backgroundMusicEnabled: value
+			startStopBellEnabled: value
 		}));
 	}
 
-	function handleBellSoundChange(event: Event) {
+	function handleIntervalBellChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
-			bellSoundEnabled: value
+			intervalBellEnabled: value
 		}));
+	}
 
-		// Dynamically control background music if meditation is running
-		if (bellSound && isRunning) {
-			if (value) {
-				bellSound.play();
-			} else {
-				bellSound.pause();
-				bellSound.currentTime = 0;
-			}
-		}
+	function handleStartStopVolumeChange(event: Event) {
+		const value = parseFloat((event.target as HTMLInputElement).value);
+		timerSettings.update((settings) => ({
+			...settings,
+			startStopBellVolume: value
+		}));
+	}
+
+	function handleIntervalVolumeChange(event: Event) {
+		const value = parseFloat((event.target as HTMLInputElement).value);
+		timerSettings.update((settings) => ({
+			...settings,
+			intervalBellVolume: value
+		}));
 	}
 </script>
 
@@ -58,7 +63,7 @@
 	>
 		<div class="relative p-6">
 			<button
-				on:click={() => (isOpen = false)}
+				onclick={() => (isOpen = false)}
 				class="absolute top-4 right-4 rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 			>
 				<X class="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -71,12 +76,39 @@
 					onChange={handleIntervalTimeChange}
 				/>
 
-				<ToggleSwitch
-					id="bellSound"
-					checked={$timerSettings.bellSoundEnabled}
-					onChange={handleBellSoundChange}
-					label="Bell Sounds"
-				/>
+				<div class="space-y-4">
+					<div class="space-y-2">
+						<ToggleSwitch
+							id="startStopBell"
+							checked={$timerSettings.startStopBellEnabled}
+							onChange={handleStartStopBellChange}
+							label="Start/Stop Bell"
+						/>
+						{#if $timerSettings.startStopBellEnabled}
+							<VolumeSlider
+								id="startStopVolume"
+								value={$timerSettings.startStopBellVolume}
+								changeVolume={handleStartStopVolumeChange}
+							/>
+						{/if}
+					</div>
+
+					<div class="space-y-2">
+						<ToggleSwitch
+							id="intervalBell"
+							checked={$timerSettings.intervalBellEnabled}
+							onChange={handleIntervalBellChange}
+							label="Interval Bell"
+						/>
+						{#if $timerSettings.intervalBellEnabled}
+							<VolumeSlider
+								id="intervalVolume"
+								value={$timerSettings.intervalBellVolume}
+								changeVolume={handleIntervalVolumeChange}
+							/>
+						{/if}
+					</div>
+				</div>
 
 				{#if import.meta.env.DEV}
 					<div class="mt-8 border-t border-gray-200 pt-4 dark:border-gray-700">

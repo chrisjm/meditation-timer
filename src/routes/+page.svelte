@@ -27,21 +27,36 @@
 	let startBell = $state<HTMLAudioElement | undefined>();
 	let intervalBell = $state<HTMLAudioElement | undefined>();
 
-	// Initialize audio event listeners
+	// Initialize audio event listeners and volume settings
 	$effect(() => {
 		if (startBell) {
 			startBell.addEventListener('ended', () => audioState.trackAudio(startBell, false));
 			startBell.addEventListener('play', () => audioState.trackAudio(startBell, true));
+			startBell.volume = $timerSettings.startStopBellVolume;
 		}
 		if (intervalBell) {
 			intervalBell.addEventListener('ended', () => audioState.trackAudio(intervalBell, false));
 			intervalBell.addEventListener('play', () => audioState.trackAudio(intervalBell, true));
+			intervalBell.volume = $timerSettings.intervalBellVolume;
+		}
+	});
+
+	// Update volumes when settings change
+	$effect(() => {
+		if (startBell) {
+			startBell.volume = $timerSettings.startStopBellVolume;
+		}
+	});
+
+	$effect(() => {
+		if (intervalBell) {
+			intervalBell.volume = $timerSettings.intervalBellVolume;
 		}
 	});
 
 	// Subscribe to interval changes
 	$effect(() => {
-		if ($shouldPlayInterval && $timerSettings.bellSoundEnabled && intervalBell) {
+		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled && intervalBell) {
 			// Reset and play the interval bell
 			intervalBell.currentTime = 0;
 
@@ -67,7 +82,7 @@
 		await handleAudio('stop');
 
 		// Play the final bell if enabled
-		if ($timerSettings.bellSoundEnabled && startBell) {
+		if ($timerSettings.startStopBellEnabled && startBell) {
 			try {
 				startBell.currentTime = 0;
 				await startBell.play();
@@ -104,7 +119,7 @@
 			await handleWakeLock('acquire');
 
 			// Play start bell first if enabled
-			if ($timerSettings.bellSoundEnabled && startBell) {
+			if ($timerSettings.startStopBellEnabled && startBell) {
 				try {
 					// First try to load the audio
 					await startBell.load();
@@ -194,14 +209,7 @@
 		<Cog class="h-6 w-6 text-gray-600 dark:text-gray-300" />
 	</button>
 	<AudioElements bind:startBell bind:intervalBell />
-	<SettingsPanel
-		bind:isOpen={isSettingsOpen}
-		isRunning={$masterTimer.isRunning}
-		bellSound={intervalBell}
-		on:close={() => (isSettingsOpen = false)}
-		on:intervalChange={(e) => ($timerSettings.intervalTime = e.detail)}
-		on:bellSoundChange={(e) => ($timerSettings.bellSoundEnabled = e.detail)}
-	/>
+	<SettingsPanel isOpen={isSettingsOpen} />
 	<main class="mx-auto max-w-3xl text-center">
 		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-bold text-slate-800 dark:text-slate-100">Meditation Timer</h1>
