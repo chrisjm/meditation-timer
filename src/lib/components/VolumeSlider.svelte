@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { id, value, label, changeVolume } = $props<{
+	let { id, value = 0.5, label, changeVolume } = $props<{
 		id: string;
 		value: number;
 		label?: string;
