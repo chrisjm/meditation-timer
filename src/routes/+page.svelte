@@ -49,6 +49,7 @@
 	});
 
 	$effect(() => {
+		console.log($timerSettings.intervalBellVolume)
 		if (intervalBell) {
 			intervalBell.volume = $timerSettings.intervalBellVolume;
 		}
