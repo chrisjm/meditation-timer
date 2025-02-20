@@ -11,9 +11,9 @@
 
 	let {
 		title = 'Meditation Timer - Focus on Your Practice',
-		description = 'A simple meditation timer to enhance your practice with soothing ambient sounds, gentle interval bells, and healing solfeggio frequencies.',
+		description = 'A simple meditation timer to enhance your practice with gentle interval bells, and healing solfeggio frequencies.',
 		type = 'website',
-		image = '/og-bg.png',
+		image = '/og-bg-v2.png',
 		canonicalUrl = 'https://meditation-timer-sable.vercel.app'
 	} = $props();
 
