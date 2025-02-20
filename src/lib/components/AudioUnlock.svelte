@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { audioUnlocked, initializeAudio, isMobile } from '$lib/utils/mobileAudioManager';
+	import { timerSettings } from '$lib/stores/timerSettings';
 
 	let audioElements: HTMLAudioElement[] = [];
 	let showUnlock = $state(false);
@@ -11,6 +12,11 @@
 
 		// Only show unlock overlay on mobile if audio isn't already unlocked
 		showUnlock = isMobile() && !$audioUnlocked;
+
+		// Auto unlock if enabled in settings
+		if ($timerSettings.autoUnlockAudio && showUnlock) {
+			handleUnlock();
+		}
 	});
 
 	const handleUnlock = async () => {
