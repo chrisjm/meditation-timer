@@ -1,1 +1,30 @@
 @import 'tailwindcss';
+
+@theme {
+
+}
+
+
+@layer base {
+    
+  /* Global Font Sizes */
+  html {
+    font-size: 16px;
+    transition: font-size 0.2s ease-in-out;
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 17px;
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 18px;
+    }
+  }
+  @media (min-width: 1280px) {
+    html {
+      font-size: 19px;
+    }
+  }
+}
