@@ -2,11 +2,6 @@
 	import { onMount } from 'svelte';
 	import { audioUnlocked, initializeAudio, isMobile } from '$lib/utils/mobileAudioManager';
 
-	let { onclick, onkeydown } = $props<{
-		onclick: () => void;
-		onkeydown: (e: KeyboardEvent) => void;
-	}>();
-
 	let audioElements: HTMLAudioElement[] = [];
 	let showUnlock = $state(false);
 
@@ -26,13 +21,19 @@
 			console.error('Failed to unlock audio:', error);
 		}
 	};
+
+	const handleUnlockKeydown = (e: KeyboardEvent) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			handleUnlock();
+		}
+	};
 </script>
 
 {#if showUnlock}
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-		{onclick}
-		{onkeydown}
+		onclick={handleUnlock}
+		onkeydown={handleUnlockKeydown}
 		role="button"
 		tabindex="0"
 		aria-label="Tap anywhere to enable audio"
