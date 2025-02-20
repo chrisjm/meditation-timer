@@ -5,6 +5,7 @@
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audioControl } from '$lib/stores/audioControl';
+	import { setVolume } from '$lib/utils/mobileAudioManager';
 
 	const {
 		src,
@@ -49,6 +50,10 @@
 
 	const handleVolumeToggle = () => {
 		if (!audioElement) return;
+		// Use our mobile-aware volume setter
+		const newVolume = isMuted ? 1 : 0;
+		setVolume(audioElement, newVolume);
+		isMuted = !isMuted;
 		isMuted = !isMuted;
 		audioElement.muted = isMuted;
 	};
