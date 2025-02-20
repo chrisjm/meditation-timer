@@ -45,7 +45,7 @@
 	{#if isExpanded}
 		<div
 			id="debug-content"
-			class="mt-4 space-y-4 rounded-lg bg-gray-100 p-4 font-mono text-sm dark:bg-gray-900 max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+			class="mt-4 space-y-4 rounded-lg bg-gray-100 p-4 font-mono text-sm dark:bg-gray-900 max-h-[30vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
 		>
 			<div>
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Timer Settings:</h4>
