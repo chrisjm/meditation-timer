@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap location (uncomment and update when you have a sitemap)
+# Sitemap: https://yourdomain.com/sitemap.xml
+
+# Crawl-delay for all bots
+Crawl-delay: 10
