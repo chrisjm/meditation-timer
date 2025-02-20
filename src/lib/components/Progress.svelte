@@ -9,7 +9,7 @@
 	let strokeDashoffset = $derived(circumference * (1 - progress));
 </script>
 
-<svg class="-rotate-90 transform" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+<svg class="-rotate-90 transform w-full h-full" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
 	<!-- Background circle -->
 	<circle
 		class="text-slate-200 dark:text-slate-800"

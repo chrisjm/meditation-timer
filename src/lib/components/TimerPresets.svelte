@@ -31,12 +31,12 @@
 <div class="relative mx-auto max-w-lg">
 	<button
 		onclick={() => isExpanded = !isExpanded}
-		class="w-full rounded-lg bg-slate-200 px-4 py-3 text-slate-700
+		class="cursor-pointer w-full rounded-full bg-slate-200/30 px-4 py-3 text-slate-700
 			transition-colors duration-200
-			hover:bg-slate-300 dark:bg-slate-800
+			hover:bg-slate-300/50 dark:bg-slate-800/50
 			dark:text-slate-300 dark:hover:bg-slate-700"
-		class:ring-2={!isExpanded}
-		class:ring-emerald-500={!isExpanded}
+		class:ring-1={!isExpanded}
+		class:ring-emerald-400={!isExpanded}
 		aria-expanded={isExpanded}
 		aria-label="Timer preset selector"
 		tabindex="0"
@@ -53,12 +53,12 @@
 				<button
 					onclick={() => handlePresetClick(preset)}
 					onkeydown={e => handleKeyDown(e, preset)}
-					class="rounded-lg bg-slate-200 px-4 py-3 text-slate-700
+					class="rounded-full bg-slate-100 px-4 py-3 text-sm text-slate-700
 						transition-colors duration-200
-						hover:bg-slate-300 dark:bg-slate-800
+						hover:bg-slate-200 dark:bg-slate-800
 						dark:text-slate-300 dark:hover:bg-slate-700"
-					class:ring-2={duration === preset * 60}
-					class:ring-emerald-500={duration === preset * 60}
+					class:ring-1={duration === preset * 60}
+					class:ring-emerald-400={duration === preset * 60}
 					aria-label="Set timer to {preset} minutes"
 					tabindex="0"
 				>

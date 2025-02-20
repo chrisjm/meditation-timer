@@ -23,7 +23,7 @@
 		/>
 	</div>
 	<div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
-		<span class="font-mono text-5xl text-slate-700 dark:text-slate-300">
+		<span class="font-sans tracking-wide text-5xl font-light {isBellPlaying ? 'text-slate-700 dark:text-slate-300' : 'text-slate-300 dark:text-slate-700'}">
 			{formatTime(time)}
 		</span>
 		{#if isBellPlaying}
