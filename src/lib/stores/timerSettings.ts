@@ -8,6 +8,10 @@ interface TimerSettings {
     intervalBellEnabled: boolean;
     intervalBellVolume: number;
     isDebugMode: boolean;
+    // Audio player settings
+    backgroundMusicEnabled: boolean;
+    backgroundMusicVolume: number;
+    autoUnlockAudio: boolean;
 }
 
 const defaultSettings: TimerSettings = {
@@ -18,6 +22,10 @@ const defaultSettings: TimerSettings = {
     intervalBellEnabled: true,
     intervalBellVolume: 0.7,
     isDebugMode: false,
+    // Audio player default settings
+    backgroundMusicEnabled: true,
+    backgroundMusicVolume: 0.7,
+    autoUnlockAudio: false,
 };
 
 function createTimerSettings() {

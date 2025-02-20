@@ -5,6 +5,7 @@
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audioControl } from '$lib/stores/audioControl';
+	import { timerSettings } from '$lib/stores/timerSettings';
 	import { setVolume } from '$lib/utils/mobileAudioManager';
 
 	const {
@@ -21,8 +22,8 @@
 
 	let audioElement: HTMLAudioElement | undefined;
 	let hls: Hls | undefined;
-	let isMuted = $state(false);
-	let volume = $state(1);
+	let isMuted = $state(!$timerSettings.backgroundMusicEnabled);
+	let volume = $state($timerSettings.backgroundMusicVolume);
 
 	// Handle audio element events
 	const handlePlay = () => audioControl.setPlaying(true);
@@ -50,12 +51,19 @@
 
 	const handleVolumeToggle = () => {
 		if (!audioElement) return;
-		// Use our mobile-aware volume setter
-		const newVolume = isMuted ? 1 : 0;
-		setVolume(audioElement, newVolume);
+
+		// Toggle mute state
 		isMuted = !isMuted;
-		isMuted = !isMuted;
+
+		// Update audio element
+		setVolume(audioElement, isMuted ? 0 : volume);
 		audioElement.muted = isMuted;
+
+		// Update settings to reflect that background music is enabled when NOT muted
+		timerSettings.update((settings) => ({
+			...settings,
+			backgroundMusicEnabled: !isMuted
+		}));
 	};
 
 	const handleSeek = (seconds: number) => {
@@ -65,8 +73,12 @@
 
 	const handleVolumeChange = (newVolume: number) => {
 		if (!audioElement) return;
+		audioElement.volume = newVolume;
 		volume = newVolume;
-		audioElement.volume = volume;
+		timerSettings.update((settings) => ({
+			...settings,
+			backgroundMusicVolume: newVolume
+		}));
 	};
 
 	// Initialize HLS
