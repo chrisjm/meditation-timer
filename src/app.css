@@ -7,12 +7,30 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-
   /* Global Font Sizes */
   html {
     font-size: 16px;
     transition: font-size 0.2s ease-in-out;
   }
+
+  .prose {
+    h2 {
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    p {
+      margin-top: 1rem;
+    }
+
+    a {
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
   @media (min-width: 768px) {
     html {
       font-size: 17px;

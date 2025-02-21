@@ -13,6 +13,7 @@
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audioState } from '$lib/stores/audioState';
 	import { audioControl } from '$lib/stores/audioControl';
+	import Credits from '$lib/components/Credits.svelte';
 
 	// Computed state for bell playing status
 	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
@@ -257,6 +258,10 @@
 				{ color: '#9932CC', length: 540, description: '963 Hz – Intuitive Awakening' }
 			]}
 		/>
+	</div>
+
+	<div class="mx-auto pt-8">
+		<Credits />
 	</div>
 </div>
 
