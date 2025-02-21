@@ -17,7 +17,7 @@
 			Start
 		</button>
 	{:else}
-		<div class="flex items-center justify-center space-x-4 opacity-50 hover:opacity-100 transition-all duration-200">
+		<div class="flex items-center justify-center space-x-4 opacity-75 hover:opacity-100 transition-all duration-200">
 			<button
 				onclick={onPause}
 				class="cursor-pointer rounded-full border border-amber-300 dark:border-amber-500 bg-gradient-to-b from-amber-100 to-amber-200 dark:from-amber-500 dark:to-amber-600 px-8 py-3 text-base font-light text-amber-900 dark:text-amber-50
