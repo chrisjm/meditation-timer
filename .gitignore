@@ -1,6 +1,9 @@
 test-results
 node_modules
 
+# We use pnpm
+.package-lock.json
+
 # Output
 .output
 .vercel
