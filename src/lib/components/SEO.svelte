@@ -13,7 +13,7 @@
 		title = 'Meditation Timer - Focus on Your Practice',
 		description = 'A simple meditation timer to enhance your practice with gentle interval bells, and healing solfeggio frequencies.',
 		type = 'website',
-		image = '/og-bg-v2.png',
+		image = '/og-bg-v3-dark.png',
 		canonicalUrl = 'https://meditation-timer-sable.vercel.app'
 	} = $props();
 
