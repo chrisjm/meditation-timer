@@ -90,13 +90,12 @@
 							onChange={handleStartStopBellChange}
 							label="Start/Stop Bell"
 						/>
-						{#if $timerSettings.startStopBellEnabled}
-							<VolumeSlider
-								id="startStopVolume"
-								value={$timerSettings.startStopBellVolume}
-								changeVolume={handleStartStopVolumeChange}
-							/>
-						{/if}
+						<VolumeSlider
+							id="startStopVolume"
+							value={$timerSettings.startStopBellVolume}
+							changeVolume={handleStartStopVolumeChange}
+							isEnabled={$timerSettings.startStopBellEnabled}
+						/>
 					</div>
 
 					<div class="space-y-2">
@@ -106,13 +105,12 @@
 							onChange={handleIntervalBellChange}
 							label="Interval Bell"
 						/>
-						{#if $timerSettings.intervalBellEnabled}
-							<VolumeSlider
-								id="intervalVolume"
-								value={$timerSettings.intervalBellVolume}
-								changeVolume={handleIntervalVolumeChange}
-							/>
-						{/if}
+						<VolumeSlider
+							id="intervalVolume"
+							value={$timerSettings.intervalBellVolume}
+							changeVolume={handleIntervalVolumeChange}
+							isEnabled={$timerSettings.intervalBellEnabled}
+						/>
 					</div>
 				</div>
 
