@@ -22,7 +22,7 @@
 			<Volume2 class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 		{/if}
 	</button>
-	{#if isIOS()}
+	{#if !isIOS()}
 		<input
 			type="range"
 			min="0"
