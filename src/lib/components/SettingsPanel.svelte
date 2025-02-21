@@ -6,7 +6,7 @@
 	import IntervalTimeInput from './IntervalTimeInput.svelte';
 	import StoreDebugInfo from './StoreDebugInfo.svelte';
 
-	let { isOpen } = $props();
+	let { isOpen, onClose } = $props();
 
 	function handleDebugModeChange(event: Event) {
 		const value = (event.target as HTMLInputElement).checked;
@@ -59,12 +59,18 @@
 
 {#if isOpen}
 	<div
+		id="settings-panel"
+		role="dialog"
+		aria-label="Settings panel"
 		class="fixed top-0 right-0 z-50 h-full w-80 transform bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-slate-800"
 	>
 		<div class="relative p-6">
 			<button
-				onclick={() => (isOpen = false)}
+				onclick={() => onClose()}
+				onkeydown={(e) => e.key === 'Escape' && onClose()}
 				class="absolute top-4 right-4 rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
+				aria-label="Close settings panel"
+				tabindex="0"
 			>
 				<X class="h-5 w-5 text-gray-600 dark:text-gray-300" />
 			</button>

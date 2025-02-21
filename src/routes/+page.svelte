@@ -200,19 +200,27 @@
 	};
 </script>
 
-<div class="relative flex min-h-screen flex-col justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-8 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
+<div
+	class="relative flex min-h-screen flex-col justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-8 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
+>
 	<!-- Settings Button -->
 	<button
 		onclick={() => (isSettingsOpen = !isSettingsOpen)}
 		class="fixed top-4 right-4 rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
+		aria-label="Toggle settings panel"
+		aria-expanded={isSettingsOpen}
+		aria-controls="settings-panel"
+		tabindex="0"
 	>
 		<Cog class="h-6 w-6 text-gray-600 dark:text-gray-300" />
 	</button>
 	<AudioElements bind:startBell bind:intervalBell />
-	<SettingsPanel isOpen={isSettingsOpen} />
-	<main class="w-full mx-auto max-w-3xl text-center">
+	<SettingsPanel isOpen={isSettingsOpen} onClose={() => (isSettingsOpen = false)} />
+	<main class="mx-auto w-full max-w-3xl text-center">
 		<!-- Header -->
-		<h1 class="mb-8 text-4xl font-light tracking-wide text-slate-800 dark:text-slate-100">Meditation Timer</h1>
+		<h1 class="mb-8 text-4xl font-light tracking-wide text-slate-800 dark:text-slate-100">
+			Meditation Timer
+		</h1>
 
 		<TimerDisplay progress={$progress} time={$masterTimer.currentTime} {isBellPlaying} />
 
@@ -226,7 +234,7 @@
 
 		<TimerPresets duration={$timerSettings.duration} onSetDuration={setDuration} />
 	</main>
-	<div class="w-full mx-auto mt-8 max-w-lg">
+	<div class="mx-auto mt-8 w-full max-w-lg">
 		<HLSAudioPlayer
 			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
 			segments={[
