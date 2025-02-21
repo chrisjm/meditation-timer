@@ -53,12 +53,14 @@
 	}
 </script>
 
-<div class="absolute top-2 left-2 z-10">
+<div class="absolute top-4 left-4 z-10">
 	<button
 		type="button"
-		class="rounded-lg p-2.5 text-sm hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-		on:click={handleToggleTheme}
+		class="rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
+		onclick={handleToggleTheme}
+		onkeydown={(e) => e.key === 'Enter' && handleToggleTheme()}
 		aria-label="Toggle dark mode"
+		tabindex="0"
 	>
 		{#if $timerSettings.theme === 'light'}
 			<svg
