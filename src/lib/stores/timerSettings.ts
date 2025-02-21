@@ -12,6 +12,8 @@ interface TimerSettings {
     backgroundMusicEnabled: boolean;
     backgroundMusicVolume: number;
     autoUnlockAudio: boolean;
+    // Theme settings
+    theme: 'light' | 'dark';
 }
 
 const defaultSettings: TimerSettings = {
@@ -26,6 +28,8 @@ const defaultSettings: TimerSettings = {
     backgroundMusicEnabled: true,
     backgroundMusicVolume: 0.7,
     autoUnlockAudio: false,
+    // Theme settings
+    theme: 'light',
 };
 
 function createTimerSettings() {

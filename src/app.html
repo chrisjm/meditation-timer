@@ -1,5 +1,25 @@
 <!doctype html>
 <html lang="en">
+	<script>
+		// Immediately set the theme to prevent flash
+		let theme;
+		try {
+			const settings = localStorage.getItem('timerSettings');
+			theme = settings ? JSON.parse(settings).theme : null;
+		} catch (e) {
+			theme = null;
+		}
+
+		// If no stored theme, use system preference
+		if (!theme) {
+			theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+		}
+
+		// Apply theme
+		if (theme === 'dark') {
+			document.documentElement.classList.add('dark');
+		}
+	</script>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />

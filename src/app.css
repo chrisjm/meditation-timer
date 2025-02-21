@@ -4,9 +4,10 @@
 
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-    
+
   /* Global Font Sizes */
   html {
     font-size: 16px;
