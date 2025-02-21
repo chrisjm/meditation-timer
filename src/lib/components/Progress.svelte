@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { progress, size = 256, strokeWidth = 4, color = 'currentColor' } = $props();
+	let { progress, size = 256, strokeWidth = 4 } = $props();
 
 	// Calculate circle properties
 	let radius = $derived(size / 2);

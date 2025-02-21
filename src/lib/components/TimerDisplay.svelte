@@ -19,15 +19,15 @@
 		<Progress
 			{progress}
 			size={256}
-			strokeWidth={8}
+			strokeWidth={16}
 		/>
 	</div>
 	<div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
-		<span class="font-sans tracking-wide text-5xl font-light {isBellPlaying ? 'text-slate-700 dark:text-slate-300' : 'text-slate-300 dark:text-slate-700'}">
+		<span class="font-mono tracking-wide text-5xl font-light {isBellPlaying ? 'text-slate-700 dark:text-slate-300' : 'text-slate-300 dark:text-slate-700'}">
 			{formatTime(time)}
 		</span>
 		{#if isBellPlaying}
-			<div 
+			<div
 				class="transition-opacity duration-300 animate-pulse"
 				role="status"
 				aria-label="Bell is ringing"

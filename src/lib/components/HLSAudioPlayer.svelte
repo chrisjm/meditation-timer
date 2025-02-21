@@ -135,7 +135,7 @@
 	});
 </script>
 
-<div class="w-full max-w-2xl rounded-full bg-slate-100 px-12 py-4 shadow-inner dark:bg-slate-950">
+<div class="w-full max-w-2xl sm:rounded-full rounded-lg bg-slate-100 sm:px-12 px-6 py-4 shadow-inner dark:bg-slate-950">
 	<audio
 		bind:this={audioElement}
 		{preload}
