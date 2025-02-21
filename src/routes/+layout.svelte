@@ -6,7 +6,7 @@
 	let { children } = $props();
 </script>
 
-<div>
+<div class="min-h-screen safe-top safe-bottom px-safe-left px-safe-right">
 	<ThemeToggle />
 	<SEO />
 	<AudioUnlock />
