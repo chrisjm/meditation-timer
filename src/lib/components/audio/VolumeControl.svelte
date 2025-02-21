@@ -22,7 +22,7 @@
 			<Volume2 class="h-6 w-6 text-slate-700 dark:text-slate-200" />
 		{/if}
 	</button>
-	{#if !isIOS()}
+	{#if isIOS()}
 		<input
 			type="range"
 			min="0"
@@ -32,7 +32,5 @@
 			oninput={(e) => volumeChange(Number((e.target as HTMLInputElement).value))}
 			class="h-2 w-24 cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-slate-700"
 		/>
-	{:else}
-		<div class="text-sm text-slate-500 dark:text-slate-400">Use device volume</div>
 	{/if}
 </div>
