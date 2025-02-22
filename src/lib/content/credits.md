@@ -20,3 +20,4 @@ A very special thank you to the following people:
 - [Vercel](https://vercel.com/)
 - [Lucide](https://lucide.dev/)
 - [HLS.js](https://hls.js.org/)
+- [Windsurf](https://codeium.com/windsurf) & [Claude Sonnet 3.5 LLM](https://www.anthropic.com/claude/sonnet)
