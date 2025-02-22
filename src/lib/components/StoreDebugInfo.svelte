@@ -22,7 +22,7 @@
 <div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
 	<button
 		type="button"
-		class="flex w-full items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+		class="flex w-full cursor-pointer items-center justify-between rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
 		on:click={handleToggle}
 		on:keydown={handleKeyDown}
 		aria-expanded={isExpanded}
@@ -45,7 +45,7 @@
 	{#if isExpanded}
 		<div
 			id="debug-content"
-			class="mt-4 space-y-4 rounded-lg bg-gray-100 p-4 font-mono text-sm dark:bg-gray-900 max-h-[30vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+			class="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent mt-4 max-h-[30vh] space-y-4 overflow-y-auto rounded-lg bg-gray-100 p-4 font-mono text-sm dark:bg-gray-900"
 		>
 			<div>
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Timer Settings:</h4>
@@ -71,7 +71,10 @@
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio Control:</h4>
 				<pre
 					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
-						{ ...$audioControl, audioElement: $audioControl.audioElement ? '[HTMLAudioElement]' : undefined },
+						{
+							...$audioControl,
+							audioElement: $audioControl.audioElement ? '[HTMLAudioElement]' : undefined
+						},
 						null,
 						2
 					)}</pre>

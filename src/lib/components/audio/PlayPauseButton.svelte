@@ -9,7 +9,7 @@
 
 <button
 	onclick={playToggle}
-	class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
+	class="cursor-pointer rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
 	aria-label={isPlaying ? 'Pause' : 'Play'}
 >
 	{#if isPlaying}

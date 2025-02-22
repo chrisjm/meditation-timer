@@ -60,7 +60,7 @@
 <div class="absolute top-4 left-4 z-10">
 	<button
 		type="button"
-		class="rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
+		class="cursor-pointer rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
 		onclick={handleToggleTheme}
 		onkeydown={(e) => e.key === 'Enter' && handleToggleTheme()}
 		aria-label="Toggle theme mode"

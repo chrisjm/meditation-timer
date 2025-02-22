@@ -13,7 +13,7 @@
 <div class="flex items-center gap-2">
 	<button
 		onclick={muteToggle}
-		class="rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
+		class="cursor-pointer rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
 		aria-label={isMuted ? 'Unmute' : 'Mute'}
 	>
 		{#if isMuted}

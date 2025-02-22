@@ -68,7 +68,7 @@
 			<button
 				onclick={() => onClose()}
 				onkeydown={(e) => e.key === 'Escape' && onClose()}
-				class="absolute top-4 right-4 rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
+				class="absolute top-4 right-4 cursor-pointer rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 				aria-label="Close settings panel"
 				tabindex="0"
 			>
