@@ -9,7 +9,7 @@
 
 A very special thank you to the following people:
 
-- [Found Brand Agency](https://foundagency.com/) for wonderful UI polish
+- [Found Brand Agency](https://foundbrand.agency/) for wonderful UI polish
 
 ## Tech Stack
 
