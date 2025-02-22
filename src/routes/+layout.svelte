@@ -14,7 +14,7 @@
 	injectSpeedInsights();
 </script>
 
-<div class="min-h-screen safe-top safe-bottom px-safe-left px-safe-right">
+<div class="min-h-screen safe-top safe-bottom px-safe-left px-safe-right bg-white dark:bg-slate-900">
 	<ThemeToggle />
 	<SEO />
 	<AudioUnlock />

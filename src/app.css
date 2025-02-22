@@ -10,7 +10,12 @@
   /* Global Font Sizes */
   html {
     font-size: 16px;
-    transition: font-size 0.2s ease-in-out;
+    transition: font-size 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    @apply bg-white dark:bg-slate-900;
+  }
+
+  body {
+    @apply bg-white dark:bg-slate-900;
   }
 
   .prose {
