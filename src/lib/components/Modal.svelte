@@ -17,11 +17,11 @@
 
 		<!-- Modal -->
 		<div
-			class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+			class="relative mx-4 flex max-h-[calc(100vh-6rem)] w-full max-w-md flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800"
 			transition:scale={{ duration: 200, start: 0.95 }}
 		>
 			{#if title}
-				<h2 id="modal-title" class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+				<h2 id="modal-title" class="px-4 pt-4 text-xl font-semibold text-gray-900 dark:text-white">
 					{title}
 				</h2>
 			{/if}
@@ -44,7 +44,7 @@
 			</button>
 
 			<!-- Modal content -->
-			<div class="mt-2">
+			<div class="flex-1 overflow-y-auto p-4">
 				{@render children()}
 			</div>
 		</div>

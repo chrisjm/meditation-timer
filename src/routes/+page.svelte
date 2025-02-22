@@ -239,22 +239,22 @@
 		<HLSAudioPlayer
 			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
 			segments={[
-				{ color: '#FF0000', length: 540, description: '174 Hz - Comfort and Security' },
-				{ color: '#FF4500', length: 540, description: '285 Hz - Healing and Rejuvenation' },
-				{ color: '#FFA500', length: 540, description: '396 Hz - Liberating Guilt and Fear' },
+				{ color: '#FF0000', length: 540, description: '174 Hz - Comfort & Security' },
+				{ color: '#FF4500', length: 540, description: '285 Hz - Healing & Rejuvenation' },
+				{ color: '#FFA500', length: 540, description: '396 Hz - Liberating Guilt & Fear' },
 				{
 					color: '#FFD700',
 					length: 540,
-					description: '417 Hz - Undoing Situations and Facilitating Change'
+					description: '417 Hz - Undoing Situations & Facilitating Change'
 				},
 				{
 					color: '#32CD32',
 					length: 540,
-					description: '528 Hz - Transformation and Miracles (DNA Repair)'
+					description: '528 Hz - Transformation & Positivity (DNA Repair)'
 				},
-				{ color: '#4169E1', length: 540, description: '639 Hz - Connecting/Relationships' },
-				{ color: '#4B0082', length: 540, description: '741 Hz - Expression/Solutions' },
-				{ color: '#8A2BE2', length: 540, description: '852 Hz – Returning to Spiritual Order' },
+				{ color: '#4169E1', length: 540, description: '639 Hz - Connecting & Relationships' },
+				{ color: '#4B0082', length: 540, description: '741 Hz - Detox' },
+				{ color: '#8A2BE2', length: 540, description: '852 Hz – Raise Energy' },
 				{ color: '#9932CC', length: 540, description: '963 Hz – Intuitive Awakening' }
 			]}
 		/>

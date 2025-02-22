@@ -26,14 +26,14 @@
 			Chris J Mears
 		</a>
 	</p>
-	<!-- <button
+	<button
 		type="button"
-		class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+		class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
 		onclick={handleOpen}
 		onkeydown={(e) => e.key === 'Enter' && handleOpen()}
 	>
 		Credits
-	</button> -->
+	</button>
 </div>
 
 <Modal {isOpen} title="Credits" close={handleClose}>
