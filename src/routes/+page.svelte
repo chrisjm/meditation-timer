@@ -14,6 +14,7 @@
 	import { audioState } from '$lib/stores/audioState';
 	import { audioControl } from '$lib/stores/audioControl';
 	import Credits from '$lib/components/Credits.svelte';
+	import { Confetti } from 'svelte-confetti';
 
 	// Computed state for bell playing status
 	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
@@ -23,6 +24,7 @@
 
 	// UI state
 	let isSettingsOpen = $state(false);
+	let showConfetti = $state(false);
 
 	// Audio elements
 	let startBell = $state<HTMLAudioElement | undefined>();
@@ -95,6 +97,9 @@
 
 		await handleWakeLock('release');
 		masterTimer.reset();
+
+		// Trigger confetti celebration
+		showConfetti = true;
 
 		// Show completion modal
 		modalStore.open("Great job! You've completed your meditation session.");
@@ -197,6 +202,7 @@
 		if ($audioControl.isPlaying) {
 			audioControl.setPlaying(false);
 		}
+		showConfetti = false;
 		modalStore.close();
 	};
 </script>
@@ -266,6 +272,21 @@
 </div>
 
 <Modal isOpen={$modalStore.isOpen} title="Meditation Complete" close={handleCloseModal}>
+	{#if showConfetti}
+		<div
+			class="pointer-events-none fixed -top-[50px] left-0 flex h-screen w-screen justify-center overflow-hidden"
+		>
+			<Confetti
+				x={[-5, 5]}
+				y={[0, 0.1]}
+				delay={[500, 2000]}
+				infinite={true}
+				duration={5000}
+				amount={500}
+				fallDistance="100vh"
+			/>
+		</div>
+	{/if}
 	<div class="space-y-4 text-center">
 		<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
 		<button
