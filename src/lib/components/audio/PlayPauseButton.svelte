@@ -9,7 +9,9 @@
 
 <button
 	onclick={playToggle}
-	class="cursor-pointer rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
+	class="cursor-pointer rounded-full p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700 plausible-event-name={isPlaying
+		? 'Meditation+Pause'
+		: 'Meditation+Start'}"
 	aria-label={isPlaying ? 'Pause' : 'Play'}
 >
 	{#if isPlaying}
