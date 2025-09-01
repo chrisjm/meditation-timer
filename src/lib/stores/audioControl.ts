@@ -32,7 +32,7 @@ const createAudioControl = () => {
           state.audioElement.pause();
         }
       }
-      window?.plausible(isPlaying ? "Audio Pause" : "Audio Play");
+      // plausible(isPlaying ? "Audio Pause" : "Audio Play");
       return update(state => ({ ...state, isPlaying }));
     },
     setTime: (currentTime: number) => {
@@ -40,7 +40,7 @@ const createAudioControl = () => {
     },
     setDuration: (duration: number) => {
       update(state => ({ ...state, duration }))
-      window?.plausible("Audio Duration Update");
+      // plausible("Audio Duration Update");
     },
     reset: () => {
       if (state.audioElement) {
@@ -48,7 +48,7 @@ const createAudioControl = () => {
         state.audioElement.currentTime = 0;
       }
       set({ isPlaying: false, currentTime: 0, duration: 0, audioElement: state.audioElement });
-      window?.plausible("Audio Reset");
+      // plausible("Audio Reset");
     },
   };
 };
