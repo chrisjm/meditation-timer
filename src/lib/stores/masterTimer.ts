@@ -32,17 +32,21 @@ function createMasterTimer() {
                     return state;
                 });
             }, debug ? 100 : 1000); // 10x faster in debug mode
+            window?.plausible("Timer Start");
         },
         pause: () => {
             update(state => ({ ...state, isPaused: !state.isPaused }));
+            window?.plausible("Timer Pause");
         },
         reset: () => {
             if (interval) clearInterval(interval);
             set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
+            window?.plausible("Timer Reset");
         },
         stop: () => {
             if (interval) clearInterval(interval);
             set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
+            window?.plausible("Timer Stop");
         }
     };
 }
