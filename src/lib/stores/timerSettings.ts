@@ -8,11 +8,8 @@ interface TimerSettings {
     intervalBellEnabled: boolean;
     intervalBellVolume: number;
     isDebugMode: boolean;
-    // Audio player settings
     backgroundMusicEnabled: boolean;
     backgroundMusicVolume: number;
-    autoUnlockAudio: boolean;
-    // Theme settings
     theme: 'light' | 'dark' | 'auto';
 }
 
@@ -24,16 +21,12 @@ const defaultSettings: TimerSettings = {
     intervalBellEnabled: true,
     intervalBellVolume: 0.7,
     isDebugMode: false,
-    // Audio player default settings
     backgroundMusicEnabled: true,
     backgroundMusicVolume: 0.7,
-    autoUnlockAudio: false,
-    // Theme settings
     theme: 'auto',
 };
 
 function createTimerSettings() {
-    // Try to load from localStorage
     const storedSettings = typeof localStorage !== 'undefined'
         ? localStorage.getItem('timerSettings')
         : null;

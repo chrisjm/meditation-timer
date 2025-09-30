@@ -6,7 +6,12 @@
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audioControl } from '$lib/stores/audioControl';
 	import { timerSettings } from '$lib/stores/timerSettings';
-	import { setVolume } from '$lib/utils/mobileAudioManager';
+	import {
+		setVolume,
+		audioUnlocked,
+		initializeAudio,
+		isMobile
+	} from '$lib/utils/mobileAudioManager';
 
 	const {
 		src,
@@ -25,7 +30,6 @@
 	let isMuted = $state(!$timerSettings.backgroundMusicEnabled);
 	let volume = $state($timerSettings.backgroundMusicVolume);
 
-	// Handle audio element events
 	const handlePlay = () => audioControl.setPlaying(true);
 	const handlePause = () => audioControl.setPlaying(false);
 	const handleTimeUpdate = () => {
@@ -39,27 +43,37 @@
 		}
 	};
 
-	// Audio control methods
-	const handlePlayPause = () => {
+	const handlePlayPause = async () => {
 		if (!audioElement) return;
+
+		if (isMobile() && !$audioUnlocked) {
+			try {
+				await initializeAudio([audioElement]);
+			} catch (err) {
+				console.error('Failed to initialize audio:', err);
+				return;
+			}
+		}
+
 		if ($audioControl.isPlaying) {
 			audioElement.pause();
 		} else {
-			audioElement.play();
+			try {
+				await audioElement.play();
+			} catch (err) {
+				console.error('Failed to play audio:', err);
+			}
 		}
 	};
 
 	const handleVolumeToggle = () => {
 		if (!audioElement) return;
 
-		// Toggle mute state
 		isMuted = !isMuted;
 
-		// Update audio element
 		setVolume(audioElement, isMuted ? 0 : volume);
 		audioElement.muted = isMuted;
 
-		// Update settings to reflect that background music is enabled when NOT muted
 		timerSettings.update((settings) => ({
 			...settings,
 			backgroundMusicEnabled: !isMuted
@@ -81,7 +95,6 @@
 		}));
 	};
 
-	// Initialize HLS
 	$effect(() => {
 		if (!audioElement) return;
 
@@ -135,7 +148,9 @@
 	});
 </script>
 
-<div class="w-full max-w-2xl sm:rounded-full rounded-lg bg-slate-100 sm:px-12 px-6 py-4 shadow-inner dark:bg-slate-950">
+<div
+	class="w-full max-w-2xl rounded-lg bg-slate-100 px-6 py-4 shadow-inner sm:rounded-full sm:px-12 dark:bg-slate-950"
+>
 	<audio
 		bind:this={audioElement}
 		{preload}

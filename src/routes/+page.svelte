@@ -15,22 +15,15 @@
 	import { audioControl } from '$lib/stores/audioControl';
 	import Credits from '$lib/components/Credits.svelte';
 	import { Confetti } from 'svelte-confetti';
+	import { audioUnlocked, initializeAudio, isMobile } from '$lib/utils/mobileAudioManager';
 
-	// Computed state for bell playing status
 	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
-
-	// Screen wake lock
 	let wakeLock = $state<WakeLockSentinel | null>(null);
-
-	// UI state
 	let isSettingsOpen = $state(false);
 	let showConfetti = $state(false);
-
-	// Audio elements
 	let startBell = $state<HTMLAudioElement | undefined>();
 	let intervalBell = $state<HTMLAudioElement | undefined>();
 
-	// Initialize audio event listeners and volume settings
 	$effect(() => {
 		if (startBell) {
 			startBell.addEventListener('ended', () => audioState.trackAudio(startBell, false));
@@ -44,7 +37,6 @@
 		}
 	});
 
-	// Update volumes when settings change
 	$effect(() => {
 		if (startBell) {
 			startBell.volume = $timerSettings.startStopBellVolume;
@@ -57,18 +49,13 @@
 		}
 	});
 
-	// Subscribe to interval changes
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled && intervalBell) {
-			// Reset and play the interval bell
 			intervalBell.currentTime = 0;
 
-			// Create a promise that resolves when the audio is ready
 			const playWhenReady = async () => {
 				try {
-					// First try to load the audio
 					await intervalBell?.load();
-					// Then try to play it
 					await intervalBell?.play();
 				} catch (err) {
 					console.error('Failed to play interval bell:', err);
@@ -80,11 +67,9 @@
 		}
 	});
 
-	// Handle meditation completion with final bell
 	async function handleMeditationComplete() {
 		await handleAudio('stop');
 
-		// Play the final bell if enabled
 		if ($timerSettings.startStopBellEnabled && startBell) {
 			try {
 				startBell.currentTime = 0;
@@ -97,44 +82,45 @@
 
 		await handleWakeLock('release');
 		masterTimer.reset();
-
-		// Trigger confetti celebration
 		showConfetti = true;
-
-		// Show completion modal
 		modalStore.open("Great job! You've completed your meditation session.");
 	}
 
-	// Handle meditation stop without final bell
 	async function handleMeditationStop() {
 		await handleAudio('stop');
 		await handleWakeLock('release');
 		masterTimer.reset();
 	}
 
-	// Subscribe to timer completion
 	$effect(() => {
 		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
 			handleMeditationComplete();
 		}
 	});
 
-	// Timer controls
 	async function startMeditation() {
 		if (!$masterTimer.isRunning) {
+			if (isMobile() && !$audioUnlocked) {
+				const audioElements = [startBell, intervalBell].filter(
+					(audio): audio is HTMLAudioElement => audio !== undefined
+				);
+				try {
+					await initializeAudio(audioElements);
+				} catch (err) {
+					console.error('Failed to initialize audio:', err);
+				}
+			}
+
 			await handleWakeLock('acquire');
 
-			// Play start bell first if enabled
 			if ($timerSettings.startStopBellEnabled && startBell) {
 				try {
-					// First try to load the audio
 					await startBell.load();
 					startBell.currentTime = 0;
 					await startBell.play();
 				} catch (err) {
 					console.error('Failed to play start bell:', err);
 					audioState.trackAudio(startBell, false);
-					// Continue with meditation even if bell fails
 				}
 			}
 
@@ -210,7 +196,6 @@
 <div
 	class="relative flex min-h-screen flex-col justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-8 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
 >
-	<!-- Settings Button -->
 	<button
 		onclick={() => (isSettingsOpen = !isSettingsOpen)}
 		class="fixed top-4 right-4 cursor-pointer rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
@@ -224,7 +209,6 @@
 	<AudioElements bind:startBell bind:intervalBell />
 	<SettingsPanel isOpen={isSettingsOpen} onClose={() => (isSettingsOpen = false)} />
 	<main class="mx-auto w-full max-w-3xl text-center">
-		<!-- Header -->
 		<h1 class="mb-8 text-4xl font-light tracking-wide text-slate-800 dark:text-slate-100">
 			Meditation Timer
 		</h1>
