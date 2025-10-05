@@ -109,6 +109,7 @@
 	class="relative flex min-h-screen flex-col justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-8 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
 >
 	<button
+		data-testid="settings-button"
 		onclick={() => (isSettingsOpen = !isSettingsOpen)}
 		class="fixed top-4 right-4 cursor-pointer rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
 		aria-label="Toggle settings panel"
