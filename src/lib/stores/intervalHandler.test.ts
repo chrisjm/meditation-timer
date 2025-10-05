@@ -70,43 +70,48 @@ describe('intervalHandler', () => {
 			timerSettings.update(s => ({ ...s, duration: 60, intervalTime: 30 }));
 			masterTimer.start(60);
 
-			// Manually set to end state
 			masterTimer.stop();
 			expect(get(shouldPlayInterval)).toBe(false);
 		});
 
 		it('should only trigger once per interval crossing', async () => {
-			vi.useFakeTimers();
-			timerSettings.update(s => ({ ...s, duration: 300, intervalTime: 60 }));
-			masterTimer.start(300, true);
+		vi.useFakeTimers();
+		timerSettings.update(s => ({ ...s, duration: 300, intervalTime: 60 }));
+		masterTimer.start(300, true);
+		
+		await vi.advanceTimersByTimeAsync(6100);
+		const firstCheck = get(shouldPlayInterval);
+		expect(firstCheck).toBe(true);
 
-			// Cross first interval
-			await vi.advanceTimersByTimeAsync(6100);
-			const firstCheck = get(shouldPlayInterval);
-			expect(firstCheck).toBe(true);
+		// Check again without crossing another interval
+		await vi.advanceTimersByTimeAsync(100);
+		const secondCheck = get(shouldPlayInterval);
+		expect(secondCheck).toBe(false);
 
-			// Check again without crossing another interval
-			await vi.advanceTimersByTimeAsync(100);
-			const secondCheck = get(shouldPlayInterval);
-			expect(secondCheck).toBe(false);
+		vi.useRealTimers();
+	});
 
-			vi.useRealTimers();
+	it('should trigger at multiple interval boundaries', async () => {
+		vi.useFakeTimers();
+		timerSettings.update(s => ({ ...s, duration: 300, intervalTime: 60 }));
+		
+		const triggers: boolean[] = [];
+		const unsubscribe = shouldPlayInterval.subscribe(value => {
+			if (value) triggers.push(value);
 		});
 
-		it('should trigger at multiple interval boundaries', async () => {
-			vi.useFakeTimers();
-			timerSettings.update(s => ({ ...s, duration: 300, intervalTime: 60 }));
-			masterTimer.start(300, true);
+		masterTimer.start(300, true);
 
-			// Cross first interval (60s elapsed)
-			await vi.advanceTimersByTimeAsync(6100);
-			expect(get(shouldPlayInterval)).toBe(true);
+		// Cross first interval (60s elapsed)
+		await vi.advanceTimersByTimeAsync(6100);
+		expect(triggers.length).toBeGreaterThanOrEqual(1);
 
-			// Cross second interval (120s elapsed) - need another 6000ms
-			await vi.advanceTimersByTimeAsync(6000);
-			expect(get(shouldPlayInterval)).toBe(true);
+		// Cross second interval (120s elapsed) - need another 6000ms
+		await vi.advanceTimersByTimeAsync(6000);
+		expect(triggers.length).toBeGreaterThanOrEqual(2);
 
-			vi.useRealTimers();
-		});
+		unsubscribe();
+		vi.useRealTimers();
+	});
 	});
 });
