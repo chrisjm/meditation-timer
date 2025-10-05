@@ -15,7 +15,13 @@ const createAudioControl = () => {
     audioElement: undefined,
   });
 
-  let state: AudioControl;
+  let state: AudioControl = {
+    isPlaying: false,
+    currentTime: 0,
+    duration: 0,
+    audioElement: undefined,
+  };
+
   subscribe(value => {
     state = value;
   });
@@ -23,32 +29,38 @@ const createAudioControl = () => {
   return {
     subscribe,
     setAudioElement: (element: HTMLAudioElement | undefined) =>
-      update(state => ({ ...state, audioElement: element })),
+      update(s => {
+        state = { ...s, audioElement: element };
+        return state;
+      }),
     setPlaying: (isPlaying: boolean) => {
-      if (state.audioElement) {
-        if (isPlaying) {
-          state.audioElement.play();
-        } else {
-          state.audioElement.pause();
+      update(s => {
+        if (s.audioElement && s.isPlaying !== isPlaying) {
+          if (isPlaying) {
+            s.audioElement.play().catch(err => {
+              console.error('Failed to play audio:', err);
+            });
+          } else {
+            s.audioElement.pause();
+          }
         }
-      }
-      // plausible(isPlaying ? "Audio Pause" : "Audio Play");
-      return update(state => ({ ...state, isPlaying }));
+        return { ...s, isPlaying };
+      });
     },
     setTime: (currentTime: number) => {
-      update(state => ({ ...state, currentTime }));
+      update(s => ({ ...s, currentTime }));
     },
     setDuration: (duration: number) => {
-      update(state => ({ ...state, duration }))
-      // plausible("Audio Duration Update");
+      update(s => ({ ...s, duration }));
     },
     reset: () => {
-      if (state.audioElement) {
-        state.audioElement.pause();
-        state.audioElement.currentTime = 0;
-      }
-      set({ isPlaying: false, currentTime: 0, duration: 0, audioElement: state.audioElement });
-      // plausible("Audio Reset");
+      update(s => {
+        if (s.audioElement) {
+          s.audioElement.pause();
+          s.audioElement.currentTime = 0;
+        }
+        return { ...s, isPlaying: false, currentTime: 0, duration: 0 };
+      });
     },
   };
 };

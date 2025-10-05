@@ -29,6 +29,9 @@
 	let hls: Hls | undefined;
 	let isMuted = $state(!$timerSettings.backgroundMusicEnabled);
 	let volume = $state($timerSettings.backgroundMusicVolume);
+	let isMediaReady = $state(false);
+	let isLoading = $state(false);
+	let mediaReadyPromise: Promise<void> | null = null;
 
 	const handlePlay = () => audioControl.setPlaying(true);
 	const handlePause = () => audioControl.setPlaying(false);
@@ -46,23 +49,60 @@
 	const handlePlayPause = async () => {
 		if (!audioElement) return;
 
+		const element = audioElement;
+
+		if ($audioControl.isPlaying) {
+			element.pause();
+			return;
+		}
+
+		if (!isMediaReady) {
+			isLoading = true;
+			try {
+				if (mediaReadyPromise) {
+					await mediaReadyPromise;
+				} else {
+					console.warn('Media initialization not started');
+					isLoading = false;
+					return;
+				}
+			} catch (err) {
+				console.error('Failed to load media:', err);
+				isLoading = false;
+				return;
+			}
+			isLoading = false;
+		}
+
 		if (isMobile() && !$audioUnlocked) {
 			try {
-				await initializeAudio([audioElement]);
+				await initializeAudio([]);
 			} catch (err) {
 				console.error('Failed to initialize audio:', err);
 				return;
 			}
 		}
 
-		if ($audioControl.isPlaying) {
-			audioElement.pause();
-		} else {
-			try {
-				await audioElement.play();
-			} catch (err) {
-				console.error('Failed to play audio:', err);
+		try {
+			if (isMobile() && element.readyState < 2) {
+				console.log('Waiting for audio to be ready...', element.readyState);
+				await new Promise<void>((resolve) => {
+					const checkReady = () => {
+						if (element.readyState >= 2) {
+							element.removeEventListener('canplay', checkReady);
+							resolve();
+						}
+					};
+					element.addEventListener('canplay', checkReady);
+					setTimeout(() => {
+						element.removeEventListener('canplay', checkReady);
+						resolve();
+					}, 5000);
+				});
 			}
+			await element.play();
+		} catch (err) {
+			console.error('Failed to play audio:', err);
 		}
 	};
 
@@ -99,38 +139,71 @@
 		if (!audioElement) return;
 
 		audioControl.setAudioElement(audioElement);
+		isMediaReady = false;
+
+		const element = audioElement;
+		element.dataset.hlsManaged = 'true';
 
 		if (Hls.isSupported()) {
-			hls = new Hls({
+			const hlsInstance = new Hls({
 				enableWorker: true,
-				lowLatencyMode: true
+				lowLatencyMode: true,
+				maxBufferLength: 30,
+				maxMaxBufferLength: 600,
+				backBufferLength: 90
 			});
+			hls = hlsInstance;
 
-			hls.attachMedia(audioElement);
-			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-				hls?.loadSource(src);
-			});
+			mediaReadyPromise = new Promise((resolve, reject) => {
+				hlsInstance.attachMedia(element);
+				hlsInstance.on(Hls.Events.MEDIA_ATTACHED, () => {
+					hlsInstance.loadSource(src);
+				});
 
-			hls.on(Hls.Events.ERROR, (event, data) => {
-				if (data.fatal) {
-					switch (data.type) {
-						case Hls.ErrorTypes.NETWORK_ERROR:
-							console.log('fatal network error encountered, trying to recover');
-							hls?.startLoad();
-							break;
-						case Hls.ErrorTypes.MEDIA_ERROR:
-							console.log('fatal media error encountered, trying to recover');
-							hls?.recoverMediaError();
-							break;
-						default:
-							console.error('Fatal error, destroying HLS instance');
-							destroyHls();
-							break;
+				hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+					isMediaReady = true;
+					resolve();
+				});
+
+				hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+					console.log('HLS Error:', data.type, data.details, data.fatal);
+					if (data.fatal) {
+						switch (data.type) {
+							case Hls.ErrorTypes.NETWORK_ERROR:
+								console.log('fatal network error encountered, trying to recover');
+								isMediaReady = false;
+								hlsInstance.startLoad();
+								break;
+							case Hls.ErrorTypes.MEDIA_ERROR:
+								console.log('fatal media error encountered, trying to recover');
+								isMediaReady = false;
+								hlsInstance.recoverMediaError();
+								break;
+							default:
+								console.error('Fatal error, cannot recover');
+								isMediaReady = false;
+								reject(new Error('Fatal HLS error'));
+								break;
+						}
 					}
-				}
+				});
 			});
-		} else if (audioElement.canPlayType('application/vnd.apple.mpegurl')) {
-			audioElement.src = src;
+
+			return () => {
+				hlsInstance.destroy();
+			};
+		} else if (element.canPlayType('application/vnd.apple.mpegurl')) {
+			mediaReadyPromise = new Promise((resolve) => {
+				element.src = src;
+				element.addEventListener(
+					'loadedmetadata',
+					() => {
+						isMediaReady = true;
+						resolve();
+					},
+					{ once: true }
+				);
+			});
 		}
 	});
 
@@ -139,6 +212,8 @@
 			hls.destroy();
 			hls = undefined;
 		}
+		isMediaReady = false;
+		mediaReadyPromise = null;
 	};
 
 	onDestroy(() => {
@@ -172,7 +247,11 @@
 
 		<div class="flex items-center">
 			<div class="flex w-full items-center justify-between gap-4">
-				<PlayPauseButton isPlaying={$audioControl.isPlaying} playToggle={handlePlayPause} />
+				<PlayPauseButton
+					isPlaying={$audioControl.isPlaying}
+					playToggle={handlePlayPause}
+					isDisabled={isLoading}
+				/>
 				<VolumeControl
 					{isMuted}
 					{volume}

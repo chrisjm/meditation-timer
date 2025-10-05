@@ -32,28 +32,23 @@ function createMasterTimer() {
                     return state;
                 });
             }, debug ? 100 : 1000); // 10x faster in debug mode
-            // plausible("Timer Start");
         },
         pause: () => {
             update(state => ({ ...state, isPaused: !state.isPaused }));
-            // plausible("Timer Pause");
         },
         reset: () => {
             if (interval) clearInterval(interval);
             set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
-            // plausible("Timer Reset");
         },
         stop: () => {
             if (interval) clearInterval(interval);
             set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
-            // plausible("Timer Stop");
         }
     };
 }
 
 export const masterTimer = createMasterTimer();
 
-// Derived store for progress
 export const progress = derived(
     [masterTimer, timerSettings],
     ([$timer, $settings]) => {
