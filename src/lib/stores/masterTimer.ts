@@ -10,12 +10,17 @@ interface TimerState {
 }
 
 function createMasterTimer() {
-    let initialDuration = 0;
-
-    const { subscribe, set, update } = writable<TimerState>({
-        currentTime: initialDuration,
+    let currentState: TimerState = {
+        currentTime: 0,
         status: 'idle',
-        initialDuration
+        initialDuration: 0
+    };
+
+    const { subscribe, set, update } = writable<TimerState>(currentState);
+
+    // Keep track of state changes
+    subscribe(state => {
+        currentState = state;
     });
 
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -58,11 +63,11 @@ function createMasterTimer() {
         },
         reset: () => {
             clearTimerInterval();
-            set({ currentTime: initialDuration, status: 'idle', initialDuration });
+            set({ currentTime: currentState.initialDuration, status: 'idle', initialDuration: currentState.initialDuration });
         },
         stop: () => {
             clearTimerInterval();
-            set({ currentTime: initialDuration, status: 'idle', initialDuration });
+            set({ currentTime: currentState.initialDuration, status: 'idle', initialDuration: currentState.initialDuration });
         },
         cleanup: () => {
             clearTimerInterval();

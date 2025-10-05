@@ -79,10 +79,17 @@
 	}
 
 	async function pauseMeditation() {
+		const wasPaused = $isPaused;
 		masterTimer.pause();
-		if ($isPaused) {
+		
+		// If we just paused (was running, now paused), stop audio and release wake lock
+		if (!wasPaused && $isPaused) {
 			await meditationAudio.stopAll();
 			await wakeLock.release();
+		}
+		// If we just resumed (was paused, now running), reacquire wake lock
+		else if (wasPaused && !$isPaused) {
+			await wakeLock.acquire();
 		}
 	}
 

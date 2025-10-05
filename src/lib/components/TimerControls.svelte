@@ -11,7 +11,7 @@
 </script>
 
 <div class="mb-8 flex justify-center space-x-4 min-h-16 transition-all duration-200">
-	{#if !isRunning}
+	{#if !isRunning && !isPaused}
 		<button
 			onclick={onStart}
 			class="cursor-pointer rounded-full transition-all border border-emerald-300 dark:border-emerald-500 bg-gradient-to-b from-emerald-100 to-emerald-200 dark:from-emerald-500 dark:to-emerald-600 px-8 py-3 text-2xl font-light text-emerald-900 dark:text-emerald-50
