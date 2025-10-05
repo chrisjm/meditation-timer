@@ -3,6 +3,7 @@
 	export let onChange: (event: Event) => void;
 
 	const intervals = [
+		{ value: 0, label: 'Off' },
 		{ value: 30, label: '30s' },
 		{ value: 60, label: '1m' },
 		{ value: 90, label: '90s' },
@@ -20,7 +21,7 @@
 	};
 
 	const getFormattedTime = (seconds: number): string => {
-		return intervals.find((interval) => interval.value === seconds)?.label || '0s';
+		return intervals.find((interval) => interval.value === seconds)?.label || 'Off';
 	};
 </script>
 
@@ -38,7 +39,7 @@
 		<input
 			type="range"
 			id="intervalTime"
-			min="30"
+			min="0"
 			max="120"
 			step="30"
 			{value}

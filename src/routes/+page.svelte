@@ -35,6 +35,7 @@
 
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
+			console.log('Playing interval bell');
 			meditationAudio.playIntervalBell();
 		}
 	});
