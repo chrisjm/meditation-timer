@@ -1,6 +1,25 @@
 <script lang="ts">
-	export let startBell: HTMLAudioElement | undefined;
-	export let intervalBell: HTMLAudioElement | undefined;
+	interface AudioElementsProps {
+		onStartBellReady?: (element: HTMLAudioElement) => void;
+		onIntervalBellReady?: (element: HTMLAudioElement) => void;
+	}
+
+	const { onStartBellReady, onIntervalBellReady }: AudioElementsProps = $props();
+
+	let startBell = $state<HTMLAudioElement | undefined>();
+	let intervalBell = $state<HTMLAudioElement | undefined>();
+
+	$effect(() => {
+		if (startBell && onStartBellReady) {
+			onStartBellReady(startBell);
+		}
+	});
+
+	$effect(() => {
+		if (intervalBell && onIntervalBellReady) {
+			onIntervalBellReady(intervalBell);
+		}
+	});
 </script>
 
 <audio

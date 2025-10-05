@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer } from '$lib/stores/masterTimer';
-	import { audioControl } from '$lib/stores/audioControl';
-	import { audioState } from '$lib/stores/audioState';
+	import { audio } from '$lib/stores/audio';
 	import { modalStore } from '$lib/stores/modal';
 
 	let isExpanded = false;
@@ -68,12 +67,12 @@
 			</div>
 
 			<div>
-				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio Control:</h4>
+				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio Store (HLS):</h4>
 				<pre
 					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
 						{
-							...$audioControl,
-							audioElement: $audioControl.audioElement ? '[HTMLAudioElement]' : undefined
+							...$audio.hls,
+							audioElement: $audio.hls.audioElement ? '[HTMLAudioElement]' : undefined
 						},
 						null,
 						2
@@ -81,10 +80,10 @@
 			</div>
 
 			<div>
-				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio State:</h4>
+				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Audio Store (Bells):</h4>
 				<pre
 					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
-						{ activeAudio: Array.from($audioState.activeAudio).map(() => '[HTMLAudioElement]') },
+						{ activeAudio: Array.from($audio.bells.activeAudio).map(() => '[HTMLAudioElement]') },
 						null,
 						2
 					)}</pre>

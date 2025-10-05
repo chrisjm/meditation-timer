@@ -4,7 +4,7 @@
 	import TimeSlider, { type Segment } from './audio/TimeSlider.svelte';
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
-	import { audioControl } from '$lib/stores/audioControl';
+	import { audio } from '$lib/stores/audio';
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import {
 		setVolume,
@@ -33,16 +33,16 @@
 	let isLoading = $state(false);
 	let mediaReadyPromise: Promise<void> | null = null;
 
-	const handlePlay = () => audioControl.setPlaying(true);
-	const handlePause = () => audioControl.setPlaying(false);
+	const handlePlay = () => audio.hls.setPlaying(true);
+	const handlePause = () => audio.hls.setPlaying(false);
 	const handleTimeUpdate = () => {
 		if (audioElement) {
-			audioControl.setTime(audioElement.currentTime);
+			audio.hls.setTime(audioElement.currentTime);
 		}
 	};
 	const handleDurationChange = () => {
 		if (audioElement) {
-			audioControl.setDuration(audioElement.duration);
+			audio.hls.setDuration(audioElement.duration);
 		}
 	};
 
@@ -51,7 +51,7 @@
 
 		const element = audioElement;
 
-		if ($audioControl.isPlaying) {
+		if ($audio.hls.isPlaying) {
 			element.pause();
 			return;
 		}
@@ -138,7 +138,7 @@
 	$effect(() => {
 		if (!audioElement) return;
 
-		audioControl.setAudioElement(audioElement);
+		audio.hls.setAudioElement(audioElement);
 		isMediaReady = false;
 
 		const element = audioElement;
@@ -218,8 +218,8 @@
 
 	onDestroy(() => {
 		destroyHls();
-		audioControl.setAudioElement(undefined);
-		audioControl.reset();
+		audio.hls.setAudioElement(undefined);
+		audio.hls.reset();
 	});
 </script>
 
@@ -239,8 +239,8 @@
 
 	<div class="flex flex-col gap-4">
 		<TimeSlider
-			currentTime={$audioControl.currentTime}
-			duration={$audioControl.duration}
+			currentTime={$audio.hls.currentTime}
+			duration={$audio.hls.duration}
 			{segments}
 			seek={handleSeek}
 		/>
@@ -248,7 +248,7 @@
 		<div class="flex items-center">
 			<div class="flex w-full items-center justify-between gap-4">
 				<PlayPauseButton
-					isPlaying={$audioControl.isPlaying}
+					isPlaying={$audio.hls.isPlaying}
 					playToggle={handlePlayPause}
 					isDisabled={isLoading}
 				/>

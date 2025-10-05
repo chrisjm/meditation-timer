@@ -1,48 +1,64 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { timerSettings } from './timerSettings';
 
 interface TimerState {
     currentTime: number;
     isRunning: boolean;
     isPaused: boolean;
+    initialDuration: number;
 }
 
 function createMasterTimer() {
+    let initialDuration = 0;
+
     const { subscribe, set, update } = writable<TimerState>({
-        currentTime: get(timerSettings).duration ?? 0,
+        currentTime: initialDuration,
         isRunning: false,
-        isPaused: false
+        isPaused: false,
+        initialDuration
     });
 
     let interval: ReturnType<typeof setInterval> | null = null;
 
+    const clearTimerInterval = () => {
+        if (interval) {
+            clearInterval(interval);
+            interval = null;
+        }
+    };
+
     return {
         subscribe,
         start: (duration: number, debug = false) => {
-            set({ currentTime: duration, isRunning: true, isPaused: false });
+            clearTimerInterval();
+
+            set({ currentTime: duration, isRunning: true, isPaused: false, initialDuration: duration });
             interval = setInterval(() => {
                 update(state => {
                     if (!state.isPaused && state.currentTime > 0) {
                         return { ...state, currentTime: state.currentTime - 1 };
                     }
                     if (state.currentTime === 0) {
-                        if (interval) clearInterval(interval);
+                        clearTimerInterval();
                         return { ...state, isRunning: false };
                     }
                     return state;
                 });
-            }, debug ? 100 : 1000); // 10x faster in debug mode
+            }, debug ? 100 : 1000);
         },
         pause: () => {
             update(state => ({ ...state, isPaused: !state.isPaused }));
         },
         reset: () => {
-            if (interval) clearInterval(interval);
-            set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
+            clearTimerInterval();
+            set({ currentTime: initialDuration, isRunning: false, isPaused: false, initialDuration });
         },
         stop: () => {
-            if (interval) clearInterval(interval);
-            set({ currentTime: get(timerSettings).duration, isRunning: false, isPaused: false });
+            clearTimerInterval();
+            set({ currentTime: initialDuration, isRunning: false, isPaused: false, initialDuration });
+        },
+        cleanup: () => {
+            clearTimerInterval();
         }
     };
 }

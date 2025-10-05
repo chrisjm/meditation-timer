@@ -1,9 +1,13 @@
 <script lang="ts">
-	export let isRunning: boolean;
-	export let isPaused: boolean;
-	export let onStart: () => void;
-	export let onPause: () => void;
-	export let onReset: () => void;
+	interface TimerControlsProps {
+		isRunning: boolean;
+		isPaused: boolean;
+		onStart: () => void;
+		onPause: () => void;
+		onReset: () => void;
+	}
+
+	const { isRunning, isPaused, onStart, onPause, onReset }: TimerControlsProps = $props();
 </script>
 
 <div class="mb-8 flex justify-center space-x-4 min-h-16 transition-all duration-200">

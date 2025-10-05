@@ -11,84 +11,50 @@
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer, progress } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
-	import { audioState } from '$lib/stores/audioState';
-	import { audioControl } from '$lib/stores/audioControl';
+	import { audio } from '$lib/stores/audio';
 	import Credits from '$lib/components/Credits.svelte';
 	import { Confetti } from 'svelte-confetti';
-	import { audioUnlocked, initializeAudio, isMobile } from '$lib/utils/mobileAudioManager';
+	import { useWakeLock } from '$lib/composables/useWakeLock.svelte';
+	import { useMeditationAudio } from '$lib/composables/useMeditationAudio.svelte';
+	import { AUDIO_CONFIG } from '$lib/config/audio';
 
-	let isBellPlaying = $derived($audioState.activeAudio.size > 0);
-	let wakeLock = $state<WakeLockSentinel | null>(null);
+	const wakeLock = useWakeLock();
+	const meditationAudio = useMeditationAudio();
+
+	let isBellPlaying = $derived($audio.bells.activeAudio.size > 0);
 	let isSettingsOpen = $state(false);
 	let showConfetti = $state(false);
-	let startBell = $state<HTMLAudioElement | undefined>();
-	let intervalBell = $state<HTMLAudioElement | undefined>();
 
 	$effect(() => {
-		if (startBell) {
-			startBell.addEventListener('ended', () => audioState.trackAudio(startBell, false));
-			startBell.addEventListener('play', () => audioState.trackAudio(startBell, true));
-			startBell.volume = $timerSettings.startStopBellVolume;
-		}
-		if (intervalBell) {
-			intervalBell.addEventListener('ended', () => audioState.trackAudio(intervalBell, false));
-			intervalBell.addEventListener('play', () => audioState.trackAudio(intervalBell, true));
-			intervalBell.volume = $timerSettings.intervalBellVolume;
-		}
+		meditationAudio.updateStartBellVolume($timerSettings.startStopBellVolume);
 	});
 
 	$effect(() => {
-		if (startBell) {
-			startBell.volume = $timerSettings.startStopBellVolume;
-		}
+		meditationAudio.updateIntervalBellVolume($timerSettings.intervalBellVolume);
 	});
 
 	$effect(() => {
-		if (intervalBell) {
-			intervalBell.volume = $timerSettings.intervalBellVolume;
-		}
-	});
-
-	$effect(() => {
-		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled && intervalBell) {
-			intervalBell.currentTime = 0;
-
-			const playWhenReady = async () => {
-				try {
-					await intervalBell?.load();
-					await intervalBell?.play();
-				} catch (err) {
-					console.error('Failed to play interval bell:', err);
-					audioState.trackAudio(intervalBell, false);
-				}
-			};
-
-			playWhenReady();
+		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
+			meditationAudio.playIntervalBell();
 		}
 	});
 
 	async function handleMeditationComplete() {
-		await handleAudio('stop');
+		await meditationAudio.stopAll();
 
-		if ($timerSettings.startStopBellEnabled && startBell) {
-			try {
-				startBell.currentTime = 0;
-				await startBell.play();
-			} catch (err) {
-				console.error('Failed to play final bell:', err);
-				audioState.trackAudio(startBell, false);
-			}
+		if ($timerSettings.startStopBellEnabled) {
+			await meditationAudio.playStartBell();
 		}
 
-		await handleWakeLock('release');
+		await wakeLock.release();
 		masterTimer.reset();
 		showConfetti = true;
 		modalStore.open("Great job! You've completed your meditation session.");
 	}
 
 	async function handleMeditationStop() {
-		await handleAudio('stop');
-		await handleWakeLock('release');
+		await meditationAudio.stopAll();
+		await wakeLock.release();
 		masterTimer.reset();
 	}
 
@@ -100,76 +66,22 @@
 
 	async function startMeditation() {
 		if (!$masterTimer.isRunning) {
-			if (isMobile() && !$audioUnlocked) {
-				const audioElements = [startBell, intervalBell].filter(
-					(audio): audio is HTMLAudioElement => audio !== undefined
-				);
-				try {
-					await initializeAudio(audioElements);
-				} catch (err) {
-					console.error('Failed to initialize audio:', err);
-				}
-			}
+			await meditationAudio.initializeMobileAudio();
+			await wakeLock.acquire();
 
-			await handleWakeLock('acquire');
-
-			if ($timerSettings.startStopBellEnabled && startBell) {
-				try {
-					await startBell.load();
-					startBell.currentTime = 0;
-					await startBell.play();
-				} catch (err) {
-					console.error('Failed to play start bell:', err);
-					audioState.trackAudio(startBell, false);
-				}
+			if ($timerSettings.startStopBellEnabled) {
+				await meditationAudio.playStartBell();
 			}
 
 			masterTimer.start($timerSettings.duration, $timerSettings.isDebugMode);
 		}
 	}
 
-	async function handleAudio(action: 'stop' | 'resume') {
-		const audioElements = [startBell, intervalBell].filter(
-			(audio): audio is HTMLAudioElement => audio !== undefined
-		);
-
-		if (action === 'stop') {
-			await Promise.all(
-				audioElements.map(async (audio) => {
-					await audio.pause();
-					audio.currentTime = 0;
-					audioState.trackAudio(audio, false);
-				})
-			);
-		} else if (action === 'resume' && !$masterTimer.isPaused) {
-			// Do nothing
-		}
-	}
-
-	async function handleWakeLock(action: 'acquire' | 'release') {
-		if (action === 'acquire' && !wakeLock) {
-			try {
-				wakeLock = await navigator.wakeLock?.request('screen');
-			} catch (err) {
-				console.log(`Failed to request wake lock: ${err}`);
-			}
-		} else if (action === 'release' && wakeLock) {
-			try {
-				await wakeLock.release();
-				wakeLock = null;
-			} catch (err) {
-				console.log(`Failed to release wake lock: ${err}`);
-			}
-		}
-	}
-
 	async function pauseMeditation() {
 		masterTimer.pause();
 		if ($masterTimer.isPaused) {
-			await handleAudio('stop');
-			await handleWakeLock('release');
-		} else {
-			await handleAudio('resume');
+			await meditationAudio.stopAll();
+			await wakeLock.release();
 		}
 	}
 
@@ -185,8 +97,8 @@
 	}
 
 	const handleCloseModal = async () => {
-		if ($audioControl.isPlaying) {
-			audioControl.setPlaying(false);
+		if ($audio.hls.isPlaying) {
+			audio.hls.setPlaying(false);
 		}
 		showConfetti = false;
 		modalStore.close();
@@ -206,7 +118,10 @@
 	>
 		<Cog class="h-6 w-6 text-gray-600 dark:text-gray-300" />
 	</button>
-	<AudioElements bind:startBell bind:intervalBell />
+	<AudioElements
+		onStartBellReady={meditationAudio.setStartBell}
+		onIntervalBellReady={meditationAudio.setIntervalBell}
+	/>
 	<SettingsPanel isOpen={isSettingsOpen} onClose={() => (isSettingsOpen = false)} />
 	<main class="mx-auto w-full max-w-3xl text-center">
 		<h1 class="mb-8 text-4xl font-light tracking-wide text-slate-800 dark:text-slate-100">
@@ -226,28 +141,7 @@
 		<TimerPresets duration={$timerSettings.duration} onSetDuration={setDuration} />
 	</main>
 	<div class="mx-auto mt-8 w-full max-w-lg">
-		<HLSAudioPlayer
-			src="https://wanderingleafstudios.s3.us-west-1.amazonaws.com/audio/meditation-opus/meditation-opus.m3u8"
-			segments={[
-				{ color: '#FF0000', length: 540, description: '174 Hz - Comfort & Security' },
-				{ color: '#FF4500', length: 540, description: '285 Hz - Healing & Rejuvenation' },
-				{ color: '#FFA500', length: 540, description: '396 Hz - Liberating Guilt & Fear' },
-				{
-					color: '#FFD700',
-					length: 540,
-					description: '417 Hz - Undoing Situations & Facilitating Change'
-				},
-				{
-					color: '#32CD32',
-					length: 540,
-					description: '528 Hz - Transformation & Positivity (DNA Repair)'
-				},
-				{ color: '#4169E1', length: 540, description: '639 Hz - Connecting & Relationships' },
-				{ color: '#4B0082', length: 540, description: '741 Hz - Detox' },
-				{ color: '#8A2BE2', length: 540, description: '852 Hz – Raise Energy' },
-				{ color: '#9932CC', length: 540, description: '963 Hz – Intuitive Awakening' }
-			]}
-		/>
+		<HLSAudioPlayer src={AUDIO_CONFIG.hlsUrl} segments={AUDIO_CONFIG.segments} />
 	</div>
 
 	<div class="mx-auto pt-8">
