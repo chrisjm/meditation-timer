@@ -5,10 +5,10 @@
 	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import SEO from '$lib/components/SEO.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import NotificationContainer from '$lib/components/NotificationContainer.svelte';
 
 	let { children } = $props();
 
-	// Vercel analytics
 	injectAnalytics({ mode: dev ? 'development' : 'production' });
 	injectSpeedInsights();
 </script>
@@ -18,5 +18,6 @@
 >
 	<ThemeToggle />
 	<SEO />
+	<NotificationContainer />
 	{@render children()}
 </div>

@@ -9,7 +9,7 @@
 	import { Cog } from 'lucide-svelte';
 	import HLSAudioPlayer from '$lib/components/HLSAudioPlayer.svelte';
 	import { timerSettings } from '$lib/stores/timerSettings';
-	import { masterTimer, progress } from '$lib/stores/masterTimer';
+	import { masterTimer, progress, isRunning, isPaused } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audio } from '$lib/stores/audio';
 	import Credits from '$lib/components/Credits.svelte';
@@ -59,13 +59,13 @@
 	}
 
 	$effect(() => {
-		if ($masterTimer.isRunning && $masterTimer.currentTime === 0) {
+		if ($isRunning && $masterTimer.currentTime === 0) {
 			handleMeditationComplete();
 		}
 	});
 
 	async function startMeditation() {
-		if (!$masterTimer.isRunning) {
+		if (!$isRunning) {
 			await meditationAudio.initializeMobileAudio();
 			await wakeLock.acquire();
 
@@ -79,7 +79,7 @@
 
 	async function pauseMeditation() {
 		masterTimer.pause();
-		if ($masterTimer.isPaused) {
+		if ($isPaused) {
 			await meditationAudio.stopAll();
 			await wakeLock.release();
 		}
@@ -90,7 +90,7 @@
 	}
 
 	function setDuration(minutes: number) {
-		if (!$masterTimer.isRunning) {
+		if (!$isRunning) {
 			$timerSettings.duration = minutes * 60;
 			masterTimer.reset();
 		}
@@ -131,8 +131,8 @@
 		<TimerDisplay progress={$progress} time={$masterTimer.currentTime} {isBellPlaying} />
 
 		<TimerControls
-			isRunning={$masterTimer.isRunning}
-			isPaused={$masterTimer.isPaused}
+			isRunning={$isRunning}
+			isPaused={$isPaused}
 			onStart={startMeditation}
 			onPause={pauseMeditation}
 			onReset={resetMeditation}
