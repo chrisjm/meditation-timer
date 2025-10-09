@@ -44,7 +44,6 @@ export function useMeditationAudio() {
 		if (!startBell) return false;
 
 		try {
-			await startBell.load();
 			startBell.currentTime = 0;
 			await startBell.play();
 			return true;
@@ -60,7 +59,6 @@ export function useMeditationAudio() {
 
 		try {
 			intervalBell.currentTime = 0;
-			await intervalBell.load();
 			await intervalBell.play();
 			return true;
 		} catch (err) {

@@ -2,30 +2,32 @@ import { derived } from 'svelte/store';
 import { masterTimer } from './masterTimer';
 import { timerSettings } from './timerSettings';
 
-let lastIntervalTime = 0;
+const playedIntervals = new Set<number>();
 
 export const shouldPlayInterval = derived(
     [masterTimer, timerSettings],
     ([$timer, $settings]) => {
         if ($timer.status !== 'running') {
-            lastIntervalTime = 0;
+            playedIntervals.clear();
             return false;
         }
 
-        if ($settings.intervalTime === 0) {
+        if ($settings.intervalTime <= 0) {
             return false;
         }
 
-        const elapsedTime = $settings.duration - $timer.currentTime;
+        const elapsedTime = $timer.initialDuration - $timer.currentTime;
 
-        if (elapsedTime === 0 || $timer.currentTime === 0) {
+        if (elapsedTime <= 0 || $timer.currentTime <= 0) {
             return false;
         }
-        const currentInterval = Math.floor(elapsedTime / $settings.intervalTime);
-        const shouldPlay = currentInterval > 0 && currentInterval !== lastIntervalTime;
+
+        const currentIntervalIndex = Math.floor(elapsedTime / $settings.intervalTime);
+
+        const shouldPlay = currentIntervalIndex > 0 && !playedIntervals.has(currentIntervalIndex);
 
         if (shouldPlay) {
-            lastIntervalTime = currentInterval;
+            playedIntervals.add(currentIntervalIndex);
         }
 
         return shouldPlay;
