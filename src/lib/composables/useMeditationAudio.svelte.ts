@@ -23,10 +23,6 @@ export function useMeditationAudio() {
 	};
 
 	const initializeMobileAudio = async (): Promise<boolean> => {
-		if (!isMobile() || get(audioUnlocked)) {
-			return true;
-		}
-
 		const audioElements = [startBell, intervalBell].filter(
 			(audio): audio is HTMLAudioElement => audio !== undefined
 		);

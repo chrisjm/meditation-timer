@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 
 export const audioUnlocked = writable(false);
 
@@ -15,30 +15,31 @@ export const isAndroid = () => {
 };
 export const isMobile = () => isIOS() || isAndroid();
 
+/**
+ * Initializes audio for mobile browsers by "priming" each audio element.
+ * This allows programmatic playback later (e.g., by timers).
+ */
 export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
-  if (!isMobile()) {
+  if (!isMobile() || get(audioUnlocked)) {
     audioUnlocked.set(true);
     return;
   }
 
-  const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-  const audioContext = new AudioContext();
-
-  if (audioContext.state === 'suspended') {
-    await audioContext.resume();
-  }
-
+  // Prime each audio element with muted play/pause
   for (const audio of audioElements) {
-    audio.volume = isIOS() ? 1 : audio.volume;
     try {
-      await audio.load();
+      const wasMuted = audio.muted;
+      audio.muted = true;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = wasMuted;
     } catch (error) {
-      console.error('Error loading audio:', error);
+      console.error('Error priming audio element:', audio.src, error);
     }
   }
 
   audioUnlocked.set(true);
-  return audioContext;
 };
 
 export const setVolume = (audioElement: HTMLAudioElement, value: number) => {
