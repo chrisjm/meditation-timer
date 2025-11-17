@@ -35,7 +35,18 @@
 
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
-			console.log('Playing interval bell');
+			console.log('[audio] Interval bell trigger effect', {
+				masterTimer: {
+					currentTime: $masterTimer.currentTime,
+					status: $masterTimer.status,
+					initialDuration: $masterTimer.initialDuration
+				},
+				settings: {
+					intervalTime: $timerSettings.intervalTime,
+					intervalBellEnabled: $timerSettings.intervalBellEnabled
+				},
+				shouldPlayInterval: $shouldPlayInterval
+			});
 			meditationAudio.playIntervalBell();
 		}
 	});
@@ -81,7 +92,7 @@
 	async function pauseMeditation() {
 		const wasPaused = $isPaused;
 		masterTimer.pause();
-		
+
 		// If we just paused (was running, now paused), stop audio and release wake lock
 		if (!wasPaused && $isPaused) {
 			await meditationAudio.stopAll();

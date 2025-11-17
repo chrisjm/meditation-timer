@@ -37,28 +37,64 @@ export function useMeditationAudio() {
 	};
 
 	const playStartBell = async (): Promise<boolean> => {
-		if (!startBell) return false;
+		if (!startBell) {
+			console.warn('[audio] playStartBell called but startBell is not set');
+			return false;
+		}
+
+		console.log('[audio] playStartBell called', {
+			src: startBell.src,
+			readyState: startBell.readyState,
+			paused: startBell.paused,
+			currentTime: startBell.currentTime,
+			muted: startBell.muted,
+			volume: startBell.volume
+		});
 
 		try {
 			startBell.currentTime = 0;
 			await startBell.play();
 			return true;
-		} catch (err) {
-			console.error('Failed to play start bell:', err);
+		} catch (err: unknown) {
+			const error = err as Error;
+			console.error('[audio] Failed to play start bell', {
+				src: startBell.src,
+				name: error?.name,
+				message: error?.message,
+				fullError: error
+			});
 			audio.bells.trackAudio(startBell, false);
 			return false;
 		}
 	};
 
 	const playIntervalBell = async (): Promise<boolean> => {
-		if (!intervalBell) return false;
+		if (!intervalBell) {
+			console.warn('[audio] playIntervalBell called but intervalBell is not set');
+			return false;
+		}
+
+		console.log('[audio] playIntervalBell called', {
+			src: intervalBell.src,
+			readyState: intervalBell.readyState,
+			paused: intervalBell.paused,
+			currentTime: intervalBell.currentTime,
+			muted: intervalBell.muted,
+			volume: intervalBell.volume
+		});
 
 		try {
 			intervalBell.currentTime = 0;
 			await intervalBell.play();
 			return true;
-		} catch (err) {
-			console.error('Failed to play interval bell:', err);
+		} catch (err: unknown) {
+			const error = err as Error;
+			console.error('[audio] Failed to play interval bell', {
+				src: intervalBell.src,
+				name: error?.name,
+				message: error?.message,
+				fullError: error
+			});
 			audio.bells.trackAudio(intervalBell, false);
 			return false;
 		}
