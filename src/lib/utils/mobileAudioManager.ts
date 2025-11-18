@@ -1,6 +1,6 @@
-import { writable, get } from 'svelte/store';
+let audioUnlocked = false;
 
-export const audioUnlocked = writable(false);
+export const getAudioUnlocked = () => audioUnlocked;
 
 export const isIOS = () => {
 	return (
@@ -21,10 +21,10 @@ export const isMobile = () => isIOS() || isAndroid();
  */
 export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
 	const isMobileDevice = isMobile();
-	const isAlreadyUnlocked = get(audioUnlocked);
+	const isAlreadyUnlocked = audioUnlocked;
 
 	if (!isMobileDevice || isAlreadyUnlocked) {
-		audioUnlocked.set(true);
+		audioUnlocked = true;
 		return;
 	}
 
@@ -46,7 +46,7 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
 		}
 	}
 
-	audioUnlocked.set(true);
+	audioUnlocked = true;
 };
 
 export const setVolume = (audioElement: HTMLAudioElement, value: number) => {

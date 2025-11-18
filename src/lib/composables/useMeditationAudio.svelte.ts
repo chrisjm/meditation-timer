@@ -1,6 +1,5 @@
 import { audio } from '$lib/stores/audio.svelte';
-import { initializeAudio, isMobile, audioUnlocked } from '$lib/utils/mobileAudioManager';
-import { get } from 'svelte/store';
+import { initializeAudio } from '$lib/utils/mobileAudioManager';
 
 export function useMeditationAudio() {
 	let startBell = $state<HTMLAudioElement | undefined>();

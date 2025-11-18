@@ -8,7 +8,7 @@
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import {
 		setVolume,
-		audioUnlocked,
+		getAudioUnlocked,
 		initializeAudio,
 		isMobile
 	} from '$lib/utils/mobileAudioManager';
@@ -74,7 +74,7 @@
 			isLoading = false;
 		}
 
-		if (isMobile() && !$audioUnlocked) {
+		if (isMobile() && !getAudioUnlocked()) {
 			try {
 				await initializeAudio([]);
 			} catch (err) {
