@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
-	import { masterTimer } from '$lib/stores/masterTimer';
+	import { masterTimer } from '$lib/stores/masterTimer.svelte';
 	import { audio } from '$lib/stores/audio';
 	import { modalState } from '$lib/stores/modal.svelte';
 

@@ -9,7 +9,7 @@
 	import { Cog } from 'lucide-svelte';
 	import HLSAudioPlayer from '$lib/components/HLSAudioPlayer.svelte';
 	import { timerSettings, updateTimerSettings } from '$lib/stores/timerSettings.svelte';
-	import { masterTimer, progress, isRunning, isPaused } from '$lib/stores/masterTimer';
+	import { masterTimer, progress, isRunning, isPaused } from '$lib/stores/masterTimer.svelte';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audio } from '$lib/stores/audio';
 	import Credits from '$lib/components/Credits.svelte';

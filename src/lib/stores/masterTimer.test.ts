@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { get } from 'svelte/store';
-import { masterTimer, isRunning, isPaused, isIdle, progress } from './masterTimer';
+import { masterTimer, isRunning, isPaused, isIdle, progress } from './masterTimer.svelte';
 
 describe('masterTimer', () => {
 	beforeEach(() => {
