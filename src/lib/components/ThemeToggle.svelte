@@ -57,21 +57,19 @@
 	}
 </script>
 
-<div class="absolute top-4 left-4 z-10">
-	<button
-		type="button"
-		class="cursor-pointer rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
-		onclick={handleToggleTheme}
-		onkeydown={(e) => e.key === 'Enter' && handleToggleTheme()}
-		aria-label="Toggle theme mode"
-		tabindex="0"
-	>
-		{#if $timerSettings.theme === 'light'}
-			<Sun class="h-5 w-5" />
-		{:else if $timerSettings.theme === 'dark'}
-			<Moon class="h-5 w-5" />
-		{:else}
-			<SunMoon class="h-5 w-5" />
-		{/if}
-	</button>
-</div>
+<button
+	type="button"
+	class="fixed top-4 left-4 z-10 cursor-pointer rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
+	onclick={handleToggleTheme}
+	onkeydown={(e) => e.key === 'Enter' && handleToggleTheme()}
+	aria-label="Toggle theme mode"
+	tabindex="0"
+>
+	{#if $timerSettings.theme === 'light'}
+		<Sun class="h-6 w-6 text-gray-600 dark:text-gray-300" />
+	{:else if $timerSettings.theme === 'dark'}
+		<Moon class="h-6 w-6 text-gray-600 dark:text-gray-300" />
+	{:else}
+		<SunMoon class="h-6 w-6 text-gray-600 dark:text-gray-300" />
+	{/if}
+</button>
