@@ -10,7 +10,6 @@ export function useMeditationAudio() {
 		startBell = element;
 		if (element) {
 			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
-			element.addEventListener('play', () => audio.bells.trackAudio(element, true));
 		}
 	};
 
@@ -18,7 +17,6 @@ export function useMeditationAudio() {
 		intervalBell = element;
 		if (element) {
 			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
-			element.addEventListener('play', () => audio.bells.trackAudio(element, true));
 		}
 	};
 
@@ -44,6 +42,7 @@ export function useMeditationAudio() {
 
 		try {
 			startBell.currentTime = 0;
+			audio.bells.trackAudio(startBell, true);
 			await startBell.play();
 			return true;
 		} catch (err: unknown) {
@@ -67,6 +66,7 @@ export function useMeditationAudio() {
 
 		try {
 			intervalBell.currentTime = 0;
+			audio.bells.trackAudio(intervalBell, true);
 			await intervalBell.play();
 			return true;
 		} catch (err: unknown) {
