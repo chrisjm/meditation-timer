@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { get } from 'svelte/store';
-import { masterTimer, isRunning, isPaused, isIdle } from './masterTimer';
+import { masterTimer, isRunning, isPaused, isIdle, progress } from './masterTimer';
 
 describe('masterTimer', () => {
 	beforeEach(() => {
@@ -41,7 +41,7 @@ describe('masterTimer', () => {
 		masterTimer.start(60);
 		vi.advanceTimersByTime(2000);
 		expect(get(masterTimer).currentTime).toBe(58);
-		
+
 		masterTimer.pause();
 		vi.advanceTimersByTime(3000);
 		// Should still be 58, not counting down
@@ -53,15 +53,15 @@ describe('masterTimer', () => {
 		masterTimer.start(60);
 		vi.advanceTimersByTime(2000);
 		expect(get(masterTimer).currentTime).toBe(58);
-		
+
 		masterTimer.pause();
 		vi.advanceTimersByTime(3000);
 		expect(get(masterTimer).currentTime).toBe(58);
-		
+
 		// Resume (toggle pause again)
 		masterTimer.pause();
 		expect(get(isRunning)).toBe(true);
-		
+
 		vi.advanceTimersByTime(2000);
 		expect(get(masterTimer).currentTime).toBe(56);
 	});
@@ -76,7 +76,7 @@ describe('masterTimer', () => {
 		masterTimer.start(600);
 		vi.advanceTimersByTime(5000);
 		expect(get(masterTimer).currentTime).toBe(595);
-		
+
 		masterTimer.reset();
 		expect(get(masterTimer).currentTime).toBe(600);
 		expect(get(masterTimer).initialDuration).toBe(600);
@@ -87,11 +87,38 @@ describe('masterTimer', () => {
 		masterTimer.start(300);
 		vi.advanceTimersByTime(3000);
 		expect(get(masterTimer).currentTime).toBe(297);
-		
+
 		masterTimer.pause();
 		masterTimer.reset();
-		
+
 		expect(get(masterTimer).currentTime).toBe(300);
 		expect(get(masterTimer).initialDuration).toBe(300);
+	});
+
+	it('should have zero progress when idle with no initial duration', () => {
+		const currentProgress = get(progress);
+		expect(currentProgress).toBe(0);
+	});
+
+	it('should increase progress as time counts down', () => {
+		masterTimer.start(10);
+		expect(get(progress)).toBe(0);
+
+		vi.advanceTimersByTime(1000);
+		const progressAfterOneSecond = get(progress);
+		expect(progressAfterOneSecond).toBeCloseTo(0.1);
+
+		vi.advanceTimersByTime(9000);
+		const finalProgress = get(progress);
+		expect(finalProgress).toBe(1);
+	});
+
+	it('should configure idle duration with setIdleDuration and keep progress at zero', () => {
+		masterTimer.setIdleDuration(120);
+		const state = get(masterTimer);
+		expect(state.status).toBe('idle');
+		expect(state.currentTime).toBe(120);
+		expect(state.initialDuration).toBe(120);
+		expect(get(progress)).toBe(0);
 	});
 });

@@ -24,6 +24,7 @@
 	let isBellPlaying = $derived($audio.bells.activeAudio.size > 0);
 	let isSettingsOpen = $state(false);
 	let showConfetti = $state(false);
+	let hasInitializedIdleDuration = $state(false);
 
 	$effect(() => {
 		meditationAudio.updateStartBellVolume($timerSettings.startStopBellVolume);
@@ -36,6 +37,17 @@
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
 			meditationAudio.playIntervalBell();
+		}
+	});
+
+	$effect(() => {
+		if (hasInitializedIdleDuration) {
+			return;
+		}
+
+		if ($masterTimer.initialDuration === 0 && $timerSettings.duration > 0) {
+			masterTimer.setIdleDuration($timerSettings.duration);
+			hasInitializedIdleDuration = true;
 		}
 	});
 
@@ -97,10 +109,14 @@
 	}
 
 	function setDuration(minutes: number) {
-		if (!$isRunning) {
-			$timerSettings.duration = minutes * 60;
-			masterTimer.reset();
+		if ($isRunning) {
+			return;
 		}
+
+		const newDurationInSeconds = minutes * 60;
+
+		$timerSettings.duration = newDurationInSeconds;
+		masterTimer.setIdleDuration(newDurationInSeconds);
 	}
 
 	const handleCloseModal = async () => {
