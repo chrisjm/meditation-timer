@@ -23,13 +23,6 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
   const isMobileDevice = isMobile();
   const isAlreadyUnlocked = get(audioUnlocked);
 
-  console.log('[audio] initializeAudio called', {
-    isMobileDevice,
-    isAlreadyUnlocked,
-    elementCount: audioElements.length,
-    sources: audioElements.map((element) => element.src)
-  });
-
   if (!isMobileDevice || isAlreadyUnlocked) {
     audioUnlocked.set(true);
     return;
@@ -37,15 +30,6 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
 
   // Prime each audio element with muted play/pause
   for (const audio of audioElements) {
-    console.log('[audio] priming audio element (before)', {
-      src: audio.src,
-      readyState: audio.readyState,
-      paused: audio.paused,
-      currentTime: audio.currentTime,
-      muted: audio.muted,
-      volume: audio.volume
-    });
-
     try {
       if (audio.readyState === 0) {
         audio.load();
@@ -57,15 +41,6 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
       audio.pause();
       audio.currentTime = 0;
       audio.muted = wasMuted;
-
-      console.log('[audio] priming audio element (after)', {
-        src: audio.src,
-        readyState: audio.readyState,
-        paused: audio.paused,
-        currentTime: audio.currentTime,
-        muted: audio.muted,
-        volume: audio.volume
-      });
     } catch (error) {
       console.error('Error priming audio element:', audio.src, error);
     }

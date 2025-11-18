@@ -35,18 +35,6 @@
 
 	$effect(() => {
 		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
-			console.log('[audio] Interval bell trigger effect', {
-				masterTimer: {
-					currentTime: $masterTimer.currentTime,
-					status: $masterTimer.status,
-					initialDuration: $masterTimer.initialDuration
-				},
-				settings: {
-					intervalTime: $timerSettings.intervalTime,
-					intervalBellEnabled: $timerSettings.intervalBellEnabled
-				},
-				shouldPlayInterval: $shouldPlayInterval
-			});
 			meditationAudio.playIntervalBell();
 		}
 	});

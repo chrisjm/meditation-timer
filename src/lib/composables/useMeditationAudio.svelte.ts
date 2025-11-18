@@ -42,15 +42,6 @@ export function useMeditationAudio() {
 			return false;
 		}
 
-		console.log('[audio] playStartBell called', {
-			src: startBell.src,
-			readyState: startBell.readyState,
-			paused: startBell.paused,
-			currentTime: startBell.currentTime,
-			muted: startBell.muted,
-			volume: startBell.volume
-		});
-
 		try {
 			startBell.currentTime = 0;
 			await startBell.play();
@@ -73,15 +64,6 @@ export function useMeditationAudio() {
 			console.warn('[audio] playIntervalBell called but intervalBell is not set');
 			return false;
 		}
-
-		console.log('[audio] playIntervalBell called', {
-			src: intervalBell.src,
-			readyState: intervalBell.readyState,
-			paused: intervalBell.paused,
-			currentTime: intervalBell.currentTime,
-			muted: intervalBell.muted,
-			volume: intervalBell.volume
-		});
 
 		try {
 			intervalBell.currentTime = 0;
