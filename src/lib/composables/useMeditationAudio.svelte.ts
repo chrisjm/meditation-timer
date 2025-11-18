@@ -39,6 +39,13 @@ export function useMeditationAudio() {
 			return false;
 		}
 
+		// Start/finish bell has priority over interval bells
+		if (intervalBell && !intervalBell.paused) {
+			intervalBell.pause();
+			intervalBell.currentTime = 0;
+			audio.bells.trackAudio(intervalBell, false);
+		}
+
 		try {
 			startBell.currentTime = 0;
 			audio.bells.trackAudio(startBell, true);
@@ -60,6 +67,11 @@ export function useMeditationAudio() {
 	const playIntervalBell = async (): Promise<boolean> => {
 		if (!intervalBell) {
 			console.warn('[audio] playIntervalBell called but intervalBell is not set');
+			return false;
+		}
+
+		// Do not play interval bell while the start/finish bell is playing
+		if (startBell && !startBell.paused) {
 			return false;
 		}
 
