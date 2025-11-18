@@ -42,6 +42,7 @@ flowchart TD
 ## Key Components and Implementation Details
 
 1. Core Features:
+
    - Timer with presets (5, 10, 15, 20 minutes + custom)
    - Pause/Resume functionality
    - Circular progress indicator
@@ -77,6 +78,7 @@ CREATE TABLE sessions (
 ```
 
 3. Audio Implementation:
+
    - Predefined audio files in static/audio/
    - Bell sounds: singing bowl and tingsha options
    - Solfeggio Frequencies (Hz):
@@ -94,30 +96,28 @@ CREATE TABLE sessions (
 
 ```javascript
 // routes/
-  +page.svelte           // Main meditation interface
-  settings/+page.svelte  // Settings page
-  stats/+page.svelte     // Meditation statistics
++page.svelte; // Main meditation interface
+settings / +page.svelte; // Settings page
+stats / +page.svelte; // Meditation statistics
 
 // lib/
-  components/
-    Timer.svelte         // Timer with pause/resume
-    PrepTimer.svelte     // Preparation countdown
-    Progress.svelte      // Circular progress
-    AudioPlayer.svelte   // Audio handling
-    BellSelector.svelte  // Bell sound options
-    FreqSelector.svelte  // Healing tone selector
+components / Timer.svelte; // Timer with pause/resume
+PrepTimer.svelte; // Preparation countdown
+Progress.svelte; // Circular progress
+AudioPlayer.svelte; // Audio handling
+BellSelector.svelte; // Bell sound options
+FreqSelector.svelte; // Healing tone selector
 
-  stores/
-    settings.js          // LocalStorage settings
-    session.js          // Session management
+stores / settings.js; // LocalStorage settings
+session.js; // Session management
 
-  db/
-    database.js         // SQLite operations
+db / database.js; // SQLite operations
 ```
 
 5. Technical Considerations:
 
    a. Error Handling:
+
    - Audio loading failures
    - Database connection issues
    - LocalStorage unavailability
@@ -125,6 +125,7 @@ CREATE TABLE sessions (
    - Browser compatibility checks
 
    b. Testing Strategy:
+
    - Unit tests for timer logic
    - Integration tests for audio system
    - E2E tests for full meditation flow
@@ -133,6 +134,7 @@ CREATE TABLE sessions (
    - Offline functionality testing
 
    c. Performance:
+
    - Audio preloading
    - Efficient progress bar animation
    - Smooth timer updates

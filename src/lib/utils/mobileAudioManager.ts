@@ -3,15 +3,15 @@ import { writable, get } from 'svelte/store';
 export const audioUnlocked = writable(false);
 
 export const isIOS = () => {
-  return (
-    typeof window !== 'undefined' &&
-    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
-  );
+	return (
+		typeof window !== 'undefined' &&
+		(/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+			(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+	);
 };
 
 export const isAndroid = () => {
-  return typeof window !== 'undefined' && /Android/.test(navigator.userAgent);
+	return typeof window !== 'undefined' && /Android/.test(navigator.userAgent);
 };
 export const isMobile = () => isIOS() || isAndroid();
 
@@ -20,45 +20,45 @@ export const isMobile = () => isIOS() || isAndroid();
  * This allows programmatic playback later (e.g., by timers).
  */
 export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
-  const isMobileDevice = isMobile();
-  const isAlreadyUnlocked = get(audioUnlocked);
+	const isMobileDevice = isMobile();
+	const isAlreadyUnlocked = get(audioUnlocked);
 
-  if (!isMobileDevice || isAlreadyUnlocked) {
-    audioUnlocked.set(true);
-    return;
-  }
+	if (!isMobileDevice || isAlreadyUnlocked) {
+		audioUnlocked.set(true);
+		return;
+	}
 
-  // Prime each audio element with muted play/pause
-  for (const audio of audioElements) {
-    try {
-      if (audio.readyState === 0) {
-        audio.load();
-      }
+	// Prime each audio element with muted play/pause
+	for (const audio of audioElements) {
+		try {
+			if (audio.readyState === 0) {
+				audio.load();
+			}
 
-      const wasMuted = audio.muted;
-      audio.muted = true;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = 0;
-      audio.muted = wasMuted;
-    } catch (error) {
-      console.error('Error priming audio element:', audio.src, error);
-    }
-  }
+			const wasMuted = audio.muted;
+			audio.muted = true;
+			await audio.play();
+			audio.pause();
+			audio.currentTime = 0;
+			audio.muted = wasMuted;
+		} catch (error) {
+			console.error('Error priming audio element:', audio.src, error);
+		}
+	}
 
-  audioUnlocked.set(true);
+	audioUnlocked.set(true);
 };
 
 export const setVolume = (audioElement: HTMLAudioElement, value: number) => {
-  if (!audioElement) return;
+	if (!audioElement) return;
 
-  const newVolume = Math.max(0, Math.min(1, value));
+	const newVolume = Math.max(0, Math.min(1, value));
 
-  if (isIOS()) {
-    audioElement.dataset.desiredVolume = newVolume.toString();
-  } else {
-    audioElement.volume = newVolume;
-  }
+	if (isIOS()) {
+		audioElement.dataset.desiredVolume = newVolume.toString();
+	} else {
+		audioElement.volume = newVolume;
+	}
 
-  return newVolume;
+	return newVolume;
 };

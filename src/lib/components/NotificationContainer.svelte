@@ -42,7 +42,7 @@
 >
 	{#each $notifications as notification (notification.id)}
 		<div
-			class="pointer-events-auto flex min-w-[300px] max-w-md items-start gap-3 rounded-lg border p-4 shadow-lg transition-all duration-300 {getColorClasses(
+			class="pointer-events-auto flex max-w-md min-w-[300px] items-start gap-3 rounded-lg border p-4 shadow-lg transition-all duration-300 {getColorClasses(
 				notification.type
 			)}"
 			role="alert"

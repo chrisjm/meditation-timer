@@ -23,9 +23,7 @@ export const validateDuration = (duration: number): ValidationResult => {
 	} else if (duration < TIMER_CONSTRAINTS.duration.min) {
 		errors.push(`Duration must be at least ${TIMER_CONSTRAINTS.duration.min} seconds (1 minute)`);
 	} else if (duration > TIMER_CONSTRAINTS.duration.max) {
-		errors.push(
-			`Duration must be at most ${TIMER_CONSTRAINTS.duration.max} seconds (2 hours)`
-		);
+		errors.push(`Duration must be at most ${TIMER_CONSTRAINTS.duration.max} seconds (2 hours)`);
 	}
 
 	return {

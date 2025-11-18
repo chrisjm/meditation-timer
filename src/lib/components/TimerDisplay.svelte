@@ -16,26 +16,23 @@
 
 <div class="relative mx-auto mb-8 h-64 w-64">
 	<div class="absolute inset-0">
-		<Progress
-			{progress}
-			size={256}
-			strokeWidth={16}
-		/>
+		<Progress {progress} size={256} strokeWidth={16} />
 	</div>
 	<div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
-		<span class="font-mono tracking-wide text-5xl font-light {isBellPlaying ? 'text-slate-700 dark:text-slate-300' : 'text-slate-300 dark:text-slate-700'}">
+		<span
+			class="font-mono text-5xl font-light tracking-wide {isBellPlaying
+				? 'text-slate-700 dark:text-slate-300'
+				: 'text-slate-300 dark:text-slate-700'}"
+		>
 			{formatTime(time)}
 		</span>
 		{#if isBellPlaying}
 			<div
-				class="transition-opacity duration-300 animate-pulse"
+				class="animate-pulse transition-opacity duration-300"
 				role="status"
 				aria-label="Bell is ringing"
 			>
-				<Bell
-					size={24}
-					class="text-slate-600 dark:text-slate-400"
-				/>
+				<Bell size={24} class="text-slate-600 dark:text-slate-400" />
 			</div>
 		{/if}
 	</div>

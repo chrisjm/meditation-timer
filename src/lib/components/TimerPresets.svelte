@@ -30,8 +30,8 @@
 
 <div class="relative mx-auto max-w-lg">
 	<button
-		onclick={() => isExpanded = !isExpanded}
-		class="cursor-pointer w-full rounded-full bg-slate-200/30 px-4 py-3 text-slate-700
+		onclick={() => (isExpanded = !isExpanded)}
+		class="w-full cursor-pointer rounded-full bg-slate-200/30 px-4 py-3 text-slate-700
 			transition-colors duration-200
 			hover:bg-slate-300/50 dark:bg-slate-800/50
 			dark:text-slate-300 dark:hover:bg-slate-700"
@@ -47,12 +47,12 @@
 	{#if isExpanded}
 		<div
 			transition:slide={{ duration: 200 }}
-			class="absolute left-0 right-0 top-full z-10 mt-2 grid grid-cols-2 gap-4 rounded-lg bg-white p-4 shadow-lg dark:bg-slate-900 sm:grid-cols-4"
+			class="absolute top-full right-0 left-0 z-10 mt-2 grid grid-cols-2 gap-4 rounded-lg bg-white p-4 shadow-lg sm:grid-cols-4 dark:bg-slate-900"
 		>
 			{#each presets as preset}
 				<button
 					onclick={() => handlePresetClick(preset)}
-					onkeydown={e => handleKeyDown(e, preset)}
+					onkeydown={(e) => handleKeyDown(e, preset)}
 					class="rounded-full bg-slate-100 px-4 py-3 text-sm text-slate-700
 						transition-colors duration-200
 						hover:bg-slate-200 dark:bg-slate-800
