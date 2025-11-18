@@ -5,7 +5,7 @@
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audio } from '$lib/stores/audio';
-	import { timerSettings } from '$lib/stores/timerSettings';
+	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import {
 		setVolume,
 		audioUnlocked,

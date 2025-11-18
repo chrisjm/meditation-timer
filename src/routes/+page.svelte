@@ -8,7 +8,7 @@
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { Cog } from 'lucide-svelte';
 	import HLSAudioPlayer from '$lib/components/HLSAudioPlayer.svelte';
-	import { timerSettings } from '$lib/stores/timerSettings';
+	import { timerSettings, updateTimerSettings } from '$lib/stores/timerSettings.svelte';
 	import { masterTimer, progress, isRunning, isPaused } from '$lib/stores/masterTimer';
 	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
 	import { audio } from '$lib/stores/audio';
@@ -115,7 +115,10 @@
 
 		const newDurationInSeconds = minutes * 60;
 
-		$timerSettings.duration = newDurationInSeconds;
+		updateTimerSettings((settings) => ({
+			...settings,
+			duration: newDurationInSeconds
+		}));
 		masterTimer.setIdleDuration(newDurationInSeconds);
 	}
 

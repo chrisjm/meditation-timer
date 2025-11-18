@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { timerSettings } from '$lib/stores/timerSettings';
+	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import { masterTimer } from '$lib/stores/masterTimer';
 	import { audio } from '$lib/stores/audio';
 	import { modalState } from '$lib/stores/modal.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { X } from 'lucide-svelte';
-	import { timerSettings } from '$lib/stores/timerSettings';
+	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import ToggleSwitch from './ToggleSwitch.svelte';
 	import VolumeSlider from './VolumeSlider.svelte';
 	import IntervalTimeInput from './IntervalTimeInput.svelte';

@@ -1,6 +1,6 @@
 import { derived } from 'svelte/store';
 import { masterTimer } from './masterTimer';
-import { timerSettings } from './timerSettings';
+import { timerSettings } from './timerSettings.svelte';
 
 const playedIntervals = new Set<number>();
 

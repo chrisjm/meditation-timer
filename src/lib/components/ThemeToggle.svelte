@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { timerSettings } from '$lib/stores/timerSettings';
+	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { Sun, Moon, SunMoon } from 'lucide-svelte';

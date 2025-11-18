@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { get } from 'svelte/store';
 import { shouldPlayInterval } from './intervalHandler';
 import { masterTimer } from './masterTimer';
-import { timerSettings } from './timerSettings';
+import { timerSettings } from './timerSettings.svelte';
 
 describe('intervalHandler', () => {
 	beforeEach(() => {
