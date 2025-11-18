@@ -1,15 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Meditation Timer - Basic Flow', () => {
-	test.beforeEach(async ({ page }) => {
-		await page.goto('/');
-	});
+test('meditation page loads with start control', async ({ page }) => {
+	await page.goto('/');
 
-	test('should load the page', async ({ page }) => {
-		await expect(page.locator('h1')).toContainText('Meditation Timer');
-	});
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Meditation Timer' })
+	).toBeVisible();
 
-	test('should have start button visible', async ({ page }) => {
-		await expect(page.getByText('Start')).toBeVisible();
-	});
+	await expect(
+		page.getByRole('button', { name: 'Start meditation' })
+	).toBeVisible();
 });
