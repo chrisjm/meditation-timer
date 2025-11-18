@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import { masterTimer } from '$lib/stores/masterTimer.svelte';
-	import { audio } from '$lib/stores/audio';
+	import { audio } from '$lib/stores/audio.svelte';
 	import { modalState } from '$lib/stores/modal.svelte';
 
 	let isExpanded = false;

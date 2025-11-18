@@ -4,7 +4,7 @@
 	import TimeSlider, { type Segment } from './audio/TimeSlider.svelte';
 	import PlayPauseButton from './audio/PlayPauseButton.svelte';
 	import VolumeControl from './audio/VolumeControl.svelte';
-	import { audio } from '$lib/stores/audio';
+	import { audio } from '$lib/stores/audio.svelte';
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import {
 		setVolume,

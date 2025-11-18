@@ -1,4 +1,4 @@
-import { audio } from '$lib/stores/audio';
+import { audio } from '$lib/stores/audio.svelte';
 import { initializeAudio, isMobile, audioUnlocked } from '$lib/utils/mobileAudioManager';
 import { get } from 'svelte/store';
 
