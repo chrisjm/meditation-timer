@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { notifications, type Notification } from '$lib/stores/notifications';
+	import {
+		notificationsState,
+		removeNotification,
+		type Notification
+	} from '$lib/stores/notifications.svelte';
 	import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-svelte';
 
 	const getIcon = (type: Notification['type']) => {
@@ -31,7 +35,7 @@
 	};
 
 	const handleClose = (id: string) => {
-		notifications.remove(id);
+		removeNotification(id);
 	};
 </script>
 
@@ -40,7 +44,7 @@
 	aria-live="polite"
 	aria-atomic="true"
 >
-	{#each $notifications as notification (notification.id)}
+	{#each notificationsState as notification (notification.id)}
 		<div
 			class="pointer-events-auto flex max-w-md min-w-[300px] items-start gap-3 rounded-lg border p-4 shadow-lg transition-all duration-300 {getColorClasses(
 				notification.type

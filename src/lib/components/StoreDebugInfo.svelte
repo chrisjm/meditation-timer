@@ -2,7 +2,7 @@
 	import { timerSettings } from '$lib/stores/timerSettings';
 	import { masterTimer } from '$lib/stores/masterTimer';
 	import { audio } from '$lib/stores/audio';
-	import { modalStore } from '$lib/stores/modal';
+	import { modalState } from '$lib/stores/modal.svelte';
 
 	let isExpanded = false;
 
@@ -93,7 +93,7 @@
 				<h4 class="font-semibold text-emerald-600 dark:text-emerald-400">Modal Store:</h4>
 				<pre
 					class="mt-2 break-all whitespace-pre-wrap text-slate-700 dark:text-slate-300">{JSON.stringify(
-						$modalStore,
+						modalState,
 						null,
 						2
 					)}</pre>

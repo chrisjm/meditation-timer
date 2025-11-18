@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Modal from '$lib/components/Modal.svelte';
-	import { modalStore } from '$lib/stores/modal';
+	import { modalState, openModal, closeModal } from '$lib/stores/modal.svelte';
 	import TimerDisplay from '$lib/components/TimerDisplay.svelte';
 	import TimerControls from '$lib/components/TimerControls.svelte';
 	import TimerPresets from '$lib/components/TimerPresets.svelte';
@@ -61,7 +61,7 @@
 		await wakeLock.release();
 		masterTimer.reset();
 		showConfetti = true;
-		modalStore.open("Great job! You've completed your meditation session.");
+		openModal("Great job! You've completed your meditation session.");
 	}
 
 	async function handleMeditationStop() {
@@ -124,7 +124,7 @@
 			audio.hls.setPlaying(false);
 		}
 		showConfetti = false;
-		modalStore.close();
+		closeModal();
 	};
 </script>
 
@@ -173,7 +173,7 @@
 	</div>
 </div>
 
-<Modal isOpen={$modalStore.isOpen} title="Meditation Complete" close={handleCloseModal}>
+<Modal isOpen={modalState.isOpen} title="Meditation Complete" close={handleCloseModal}>
 	{#if showConfetti}
 		<div
 			class="pointer-events-none fixed -top-[50px] left-0 flex h-screen w-screen justify-center overflow-hidden"
@@ -190,7 +190,7 @@
 		</div>
 	{/if}
 	<div class="space-y-4 text-center">
-		<p class="text-gray-600 dark:text-gray-300">{$modalStore.message}</p>
+		<p class="text-gray-600 dark:text-gray-300">{modalState.message}</p>
 		<button
 			onclick={handleCloseModal}
 			class="rounded-lg bg-purple-500 px-6 py-2 font-medium text-white

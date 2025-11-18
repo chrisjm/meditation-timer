@@ -1,4 +1,4 @@
-import { notifications } from '$lib/stores/notifications';
+import { showErrorNotification } from '$lib/stores/notifications.svelte';
 
 export interface ErrorHandlingOptions {
 	showNotification?: boolean;
@@ -28,7 +28,7 @@ export async function withErrorHandling<T>(
 		if (showNotification) {
 			const message =
 				notificationMessage || (error instanceof Error ? error.message : 'An error occurred');
-			notifications.error(message);
+			showErrorNotification(message);
 		}
 
 		if (rethrow) {
@@ -60,7 +60,7 @@ export function withSyncErrorHandling<T>(
 		if (showNotification) {
 			const message =
 				notificationMessage || (error instanceof Error ? error.message : 'An error occurred');
-			notifications.error(message);
+			showErrorNotification(message);
 		}
 
 		if (rethrow) {
