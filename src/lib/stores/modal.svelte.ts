@@ -1,21 +1,21 @@
 interface ModalState {
-  isOpen: boolean;
-  message: string;
+	isOpen: boolean;
+	message: string;
 }
 
 let modalState = $state<ModalState>({
-  isOpen: false,
-  message: ''
+	isOpen: false,
+	message: ''
 });
 
 const openModal = (message: string): void => {
-  modalState.isOpen = true;
-  modalState.message = message;
+	modalState.isOpen = true;
+	modalState.message = message;
 };
 
 const closeModal = (): void => {
-  modalState.isOpen = false;
-  modalState.message = '';
+	modalState.isOpen = false;
+	modalState.message = '';
 };
 
 export { modalState, openModal, closeModal };
