@@ -6,6 +6,12 @@ const playedIntervals = new Set<number>();
 
 export const shouldPlayInterval = derived([masterTimer, timerSettings], ([$timer, $settings]) => {
 	if ($timer.status !== 'running') {
+		if (playedIntervals.size > 0) {
+			console.debug('[interval] clearing playedIntervals because timer is not running', {
+				status: $timer.status,
+				playedIntervals: Array.from(playedIntervals.values())
+			});
+		}
 		playedIntervals.clear();
 		return false;
 	}
@@ -26,6 +32,15 @@ export const shouldPlayInterval = derived([masterTimer, timerSettings], ([$timer
 
 	if (shouldPlay) {
 		playedIntervals.add(currentIntervalIndex);
+
+		console.debug('[interval] shouldPlayInterval = true', {
+			elapsedTime,
+			currentTime: $timer.currentTime,
+			initialDuration: $timer.initialDuration,
+			intervalTime: $settings.intervalTime,
+			currentIntervalIndex,
+			playedIntervals: Array.from(playedIntervals.values())
+		});
 	}
 
 	return shouldPlay;
