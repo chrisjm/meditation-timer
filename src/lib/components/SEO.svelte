@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { buildJsonLdScript } from '$lib/utils/jsonLd';
 
 	interface SEOProps {
 		title?: string;
@@ -15,11 +16,27 @@
 		type = 'website',
 		image = '/og-bg-v3-dark.png',
 		canonicalUrl = 'https://meditation-timer-sable.vercel.app'
-	} = $props();
+	}: SEOProps = $props();
 
 	// Compute full canonical URL
 	let fullCanonicalUrl = $derived(`${canonicalUrl}${$page.url.pathname}`);
 	let fullImageUrl = $derived(`${canonicalUrl}${image}`);
+	const schema = $derived({
+		'@context': 'https://schema.org',
+		'@type': 'WebApplication',
+		name: title,
+		description,
+		url: fullCanonicalUrl,
+		image: fullImageUrl,
+		applicationCategory: 'LifestyleApplication',
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD'
+		}
+	} as const);
+
+	const jsonLdScript = $derived(buildJsonLdScript(schema));
 </script>
 
 <svelte:head>
@@ -49,22 +66,5 @@
 	<meta name="googlebot" content="index, follow" />
 
 	<!-- JSON-LD Schema -->
-	{@html `
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "${title}",
-            "description": "${description}",
-            "url": "${fullCanonicalUrl}",
-            "image": "${fullImageUrl}",
-            "applicationCategory": "LifestyleApplication",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-            }
-        }
-        </script>
-    `}
+	{@html jsonLdScript}
 </svelte:head>

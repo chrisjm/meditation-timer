@@ -1,8 +1,9 @@
 import { derived } from 'svelte/store';
+import { SvelteSet } from 'svelte/reactivity';
 import { masterTimer } from './masterTimer.svelte';
 import { timerSettings } from './timerSettings.svelte';
 
-const playedIntervals = new Set<number>();
+const playedIntervals = new SvelteSet<number>();
 
 export const shouldPlayInterval = derived([masterTimer, timerSettings], ([$timer, $settings]) => {
 	if ($timer.status !== 'running') {

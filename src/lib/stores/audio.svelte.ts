@@ -1,3 +1,5 @@
+import { SvelteSet } from 'svelte/reactivity';
+
 export interface HLSPlayerState {
 	isPlaying: boolean;
 	currentTime: number;
@@ -6,7 +8,7 @@ export interface HLSPlayerState {
 }
 
 export interface BellAudioState {
-	activeAudio: Set<HTMLAudioElement>;
+	activeAudio: SvelteSet<HTMLAudioElement>;
 }
 
 export interface AudioState {
@@ -14,7 +16,7 @@ export interface AudioState {
 	bells: BellAudioState;
 }
 
-let audioState = $state<AudioState>({
+const audioState = $state<AudioState>({
 	hls: {
 		isPlaying: false,
 		currentTime: 0,
@@ -22,13 +24,13 @@ let audioState = $state<AudioState>({
 		audioElement: undefined
 	},
 	bells: {
-		activeAudio: new Set<HTMLAudioElement>()
+		activeAudio: new SvelteSet<HTMLAudioElement>()
 	}
 });
 
 type AudioSubscriber = (state: AudioState) => void;
 
-const subscribers = new Set<AudioSubscriber>();
+const subscribers = new SvelteSet<AudioSubscriber>();
 
 const notifySubscribers = (): void => {
 	subscribers.forEach((run) => {

@@ -3,7 +3,7 @@ interface ModalState {
 	message: string;
 }
 
-let modalState = $state<ModalState>({
+const modalState = $state<ModalState>({
 	isOpen: false,
 	message: ''
 });

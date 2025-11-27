@@ -7,7 +7,7 @@ export interface Notification {
 	duration?: number;
 }
 
-let notificationsState = $state<Notification[]>([]);
+const notificationsState = $state<Notification[]>([]);
 let nextNotificationId = 0;
 
 const addNotification = (

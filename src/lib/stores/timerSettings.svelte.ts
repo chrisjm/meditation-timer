@@ -1,4 +1,5 @@
 import { clampDuration, clampIntervalTime, clampVolume } from '$lib/validators/timerSettings';
+import { SvelteSet } from 'svelte/reactivity';
 
 export interface TimerSettings {
 	duration: number;
@@ -59,7 +60,7 @@ const loadInitialSettings = (): TimerSettings => {
 	}
 };
 
-let timerSettingsState = $state<TimerSettings>(loadInitialSettings());
+const timerSettingsState = $state<TimerSettings>(loadInitialSettings());
 
 const applySettings = (settings: TimerSettings): void => {
 	const sanitized = sanitizeSettings(settings);
@@ -107,7 +108,7 @@ const updateTimerSettings = (updater: (settings: TimerSettings) => TimerSettings
 
 type TimerSettingsSubscriber = (settings: TimerSettings) => void;
 
-const subscribers = new Set<TimerSettingsSubscriber>();
+const subscribers = new SvelteSet<TimerSettingsSubscriber>();
 
 const subscribe = (run: TimerSettingsSubscriber) => {
 	subscribers.add(run);

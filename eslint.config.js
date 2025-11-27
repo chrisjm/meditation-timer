@@ -29,6 +29,15 @@ export default ts.config(
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+		rules: {
+			'svelte/no-at-html-tags': 'off'
+		}
+	},
+	{
+		files: ['**/*.svelte.ts'],
+		languageOptions: {
+			parser: ts.parser
 		}
 	}
 );

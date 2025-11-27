@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import { Sun, Moon, SunMoon } from 'lucide-svelte';
 
 	// Handle theme toggle - cycles through light -> dark -> auto
@@ -12,23 +11,27 @@
 		}));
 	};
 
+	const isBrowser = typeof window !== 'undefined';
+
 	// Get system theme preference
 	const getSystemTheme = (): 'light' | 'dark' => {
-		if (!browser) return 'light';
+		if (!isBrowser) return 'light';
 		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 	};
 
 	// Apply theme class to document (only in browser)
 	const applyTheme = (theme: 'light' | 'dark' | 'auto') => {
-		if (!browser) return;
+		if (!isBrowser) return;
 		const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
-		effectiveTheme === 'dark'
-			? document.documentElement.classList.add('dark')
-			: document.documentElement.classList.remove('dark');
+		if (effectiveTheme === 'dark') {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
 	};
 
 	// Handle system theme changes
-	const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+	const handleSystemThemeChange = () => {
 		const currentSettings = $timerSettings;
 		// Only update if theme is set to auto
 		if (currentSettings.theme === 'auto') {
@@ -41,7 +44,7 @@
 		applyTheme($timerSettings.theme);
 
 		// Watch for system theme changes
-		if (browser) {
+		if (isBrowser) {
 			const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			mediaQuery.addEventListener('change', handleSystemThemeChange);
 
@@ -52,7 +55,7 @@
 	});
 
 	// Watch for theme changes
-	$: if (browser) {
+	$: if (isBrowser) {
 		applyTheme($timerSettings.theme);
 	}
 </script>
@@ -61,7 +64,11 @@
 	type="button"
 	class="fixed top-4 left-4 z-10 cursor-pointer rounded-full bg-white p-2 shadow-lg transition-colors hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
 	onclick={handleToggleTheme}
-	onkeydown={(e) => e.key === 'Enter' && handleToggleTheme()}
+	onkeydown={(event) => {
+		if (event.key === 'Enter') {
+			handleToggleTheme();
+		}
+	}}
 	aria-label="Toggle theme mode"
 	tabindex="0"
 >

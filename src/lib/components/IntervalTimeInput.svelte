@@ -48,7 +48,7 @@
 			aria-label="Interval time slider"
 		/>
 		<div class="mt-1 flex justify-between">
-			{#each intervals as interval}
+			{#each intervals as interval (interval.value)}
 				<div class="flex flex-col items-center">
 					<div class="mb-1 h-1 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
 					<span class="text-xs text-gray-500 dark:text-gray-400">{interval.label}</span>
