@@ -34,6 +34,9 @@
 			priceCurrency: 'USD'
 		}
 	} as const);
+
+	const renderJsonLd = () =>
+		'<script type="application/ld+json">' + JSON.stringify(schema) + '</scr' + 'ipt>';
 </script>
 
 <svelte:head>
@@ -63,5 +66,5 @@
 	<meta name="googlebot" content="index, follow" />
 
 	<!-- JSON-LD Schema -->
-	{@html '<script type="application/ld+json">' + JSON.stringify(schema) + '</script>'}
+	{@html renderJsonLd()}
 </svelte:head>
