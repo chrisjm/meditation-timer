@@ -1,9 +1,23 @@
 @import 'tailwindcss';
-
-@theme {
-}
+@plugin '@tailwindcss/typography';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@utility safe-top {
+	padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility safe-left {
+	padding-left: env(safe-area-inset-left);
+}
+
+@utility safe-right {
+	padding-right: env(safe-area-inset-right);
+}
 
 @layer base {
 	/* Global Font Sizes */
