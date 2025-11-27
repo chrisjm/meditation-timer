@@ -14,7 +14,7 @@
 	{#if !isRunning && !isPaused}
 		<button
 			onclick={onStart}
-			class="cursor-pointer rounded-full border border-emerald-300 bg-gradient-to-b from-emerald-100 to-emerald-200 px-8 py-3 text-2xl font-light text-emerald-900 transition-all transition-all duration-200 hover:from-emerald-200 hover:to-emerald-200
+			class="cursor-pointer rounded-full border border-emerald-300 bg-gradient-to-b from-emerald-100 to-emerald-200 px-8 py-3 text-2xl font-light text-emerald-900 transition-all duration-200 hover:from-emerald-200 hover:to-emerald-200
 				dark:border-emerald-500 dark:from-emerald-500 dark:to-emerald-600 dark:text-emerald-50 dark:hover:from-emerald-500 dark:hover:to-emerald-500"
 			aria-label="Start meditation"
 		>

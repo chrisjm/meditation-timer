@@ -9,6 +9,6 @@ export default defineConfig({
 		environment: 'jsdom',
 		setupFiles: ['./vitest-setup-client.ts'],
 		// prevent Vitest from running Playwright e2e tests
-		exclude: ['e2e/**', 'node_modules/**', '.{idea,git,cache,output,temp}/**'],
-	},
+		exclude: ['e2e/**', 'node_modules/**', '.{idea,git,cache,output,temp}/**']
+	}
 });

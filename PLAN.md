@@ -42,7 +42,6 @@ flowchart TD
 ## Key Components and Implementation Details
 
 1. Core Features:
-
    - Timer with presets (5, 10, 15, 20 minutes + custom)
    - Pause/Resume functionality
    - Circular progress indicator
@@ -78,7 +77,6 @@ CREATE TABLE sessions (
 ```
 
 3. Audio Implementation:
-
    - Predefined audio files in static/audio/
    - Bell sounds: singing bowl and tingsha options
    - Solfeggio Frequencies (Hz):
@@ -117,7 +115,6 @@ db / database.js; // SQLite operations
 5. Technical Considerations:
 
    a. Error Handling:
-
    - Audio loading failures
    - Database connection issues
    - LocalStorage unavailability
@@ -125,7 +122,6 @@ db / database.js; // SQLite operations
    - Browser compatibility checks
 
    b. Testing Strategy:
-
    - Unit tests for timer logic
    - Integration tests for audio system
    - E2E tests for full meditation flow
@@ -134,7 +130,6 @@ db / database.js; // SQLite operations
    - Offline functionality testing
 
    c. Performance:
-
    - Audio preloading
    - Efficient progress bar animation
    - Smooth timer updates
