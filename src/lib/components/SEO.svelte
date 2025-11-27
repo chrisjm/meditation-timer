@@ -15,7 +15,7 @@
 		type = 'website',
 		image = '/og-bg-v3-dark.png',
 		canonicalUrl = 'https://meditation-timer-sable.vercel.app'
-	} = $props();
+	}: SEOProps = $props();
 
 	// Compute full canonical URL
 	let fullCanonicalUrl = $derived(`${canonicalUrl}${$page.url.pathname}`);
@@ -50,21 +50,21 @@
 
 	<!-- JSON-LD Schema -->
 	{@html `
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "${title}",
-            "description": "${description}",
-            "url": "${fullCanonicalUrl}",
-            "image": "${fullImageUrl}",
-            "applicationCategory": "LifestyleApplication",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-            }
-        }
-        </script>
-    `}
+		<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "${title}",
+			"description": "${description}",
+			"url": "${fullCanonicalUrl}",
+			"image": "${fullImageUrl}",
+			"applicationCategory": "LifestyleApplication",
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD"
+			}
+		}
+		</script>
+	`}
 </svelte:head>

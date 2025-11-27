@@ -14,7 +14,7 @@ export interface AudioState {
 	bells: BellAudioState;
 }
 
-let audioState = $state<AudioState>({
+const audioState = $state<AudioState>({
 	hls: {
 		isPlaying: false,
 		currentTime: 0,

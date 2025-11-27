@@ -59,7 +59,7 @@ const loadInitialSettings = (): TimerSettings => {
 	}
 };
 
-let timerSettingsState = $state<TimerSettings>(loadInitialSettings());
+const timerSettingsState = $state<TimerSettings>(loadInitialSettings());
 
 const applySettings = (settings: TimerSettings): void => {
 	const sanitized = sanitizeSettings(settings);

@@ -6,7 +6,7 @@ export interface TimerState {
 	initialDuration: number;
 }
 
-let timerState = $state<TimerState>({
+const timerState = $state<TimerState>({
 	currentTime: 0,
 	status: 'idle',
 	initialDuration: 0
