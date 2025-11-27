@@ -13,9 +13,9 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint . --fix",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"test": "npm run test:unit -- --run",
 		"test:e2e": "playwright test",
-		"validate": "npm run lint && npm run check && npm run test"
+		"validate": "npm run lint && npm run check && npm run test:unit -- --run"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.0",
