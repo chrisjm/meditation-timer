@@ -54,7 +54,7 @@ const start = (duration: number, debug: boolean = false): void => {
 				notifySubscribers();
 			}
 		},
-		debug ? 100 : 1000
+		debug ? 200 : 1000
 	);
 };
 

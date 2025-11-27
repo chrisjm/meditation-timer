@@ -23,14 +23,31 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
 	const isMobileDevice = isMobile();
 	const isAlreadyUnlocked = audioUnlocked;
 
+	console.debug('[audio] initializeAudio called', {
+		isMobileDevice,
+		isAlreadyUnlocked,
+		audioElementCount: audioElements.length
+	});
+
 	if (!isMobileDevice || isAlreadyUnlocked) {
 		audioUnlocked = true;
+
+		console.debug('[audio] initializeAudio short-circuit', {
+			reason: !isMobileDevice ? 'not-mobile' : 'already-unlocked',
+			resultUnlocked: audioUnlocked
+		});
+
 		return;
 	}
 
 	// Prime each audio element with muted play/pause
 	for (const audio of audioElements) {
 		try {
+			console.debug('[audio] initializeAudio priming element', {
+				src: audio.src,
+				readyState: audio.readyState
+			});
+
 			if (audio.readyState === 0) {
 				audio.load();
 			}
@@ -47,6 +64,10 @@ export const initializeAudio = async (audioElements: HTMLAudioElement[]) => {
 	}
 
 	audioUnlocked = true;
+
+	console.debug('[audio] initializeAudio completed', {
+		resultUnlocked: audioUnlocked
+	});
 };
 
 export const setVolume = (audioElement: HTMLAudioElement, value: number) => {
@@ -59,6 +80,12 @@ export const setVolume = (audioElement: HTMLAudioElement, value: number) => {
 	} else {
 		audioElement.volume = newVolume;
 	}
+
+	console.debug('[audio] setVolume', {
+		src: audioElement.src,
+		newVolume,
+		appliedTo: isIOS() ? 'desiredVolumeDataAttribute' : 'elementVolumeProperty'
+	});
 
 	return newVolume;
 };

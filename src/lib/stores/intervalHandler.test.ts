@@ -15,6 +15,7 @@ describe('intervalHandler', () => {
 			intervalBellEnabled: true,
 			intervalBellVolume: 0.7,
 			isDebugMode: false,
+			isSpeedMode: false,
 			backgroundMusicEnabled: true,
 			backgroundMusicVolume: 0.5,
 			theme: 'auto'

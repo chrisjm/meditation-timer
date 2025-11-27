@@ -7,6 +7,12 @@ export function useMeditationAudio() {
 
 	const setStartBell = (element: HTMLAudioElement | undefined) => {
 		startBell = element;
+
+		console.debug('[audio] setStartBell', {
+			hasElement: Boolean(element),
+			src: element?.src
+		});
+
 		if (element) {
 			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
 		}
@@ -14,6 +20,12 @@ export function useMeditationAudio() {
 
 	const setIntervalBell = (element: HTMLAudioElement | undefined) => {
 		intervalBell = element;
+
+		console.debug('[audio] setIntervalBell', {
+			hasElement: Boolean(element),
+			src: element?.src
+		});
+
 		if (element) {
 			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
 		}
@@ -25,7 +37,15 @@ export function useMeditationAudio() {
 		);
 
 		try {
+			console.debug('[audio] initializeMobileAudio (useMeditationAudio)', {
+				hasStartBell: Boolean(startBell),
+				hasIntervalBell: Boolean(intervalBell),
+				audioElementCount: audioElements.length
+			});
+
 			await initializeAudio(audioElements);
+
+			console.debug('[audio] initializeMobileAudio success (useMeditationAudio)');
 			return true;
 		} catch (err) {
 			console.error('Failed to initialize audio:', err);
@@ -39,8 +59,18 @@ export function useMeditationAudio() {
 			return false;
 		}
 
+		console.debug('[audio] playStartBell invoked', {
+			src: startBell.src,
+			isIntervalBellSet: Boolean(intervalBell),
+			isIntervalBellPlaying: intervalBell ? !intervalBell.paused : false
+		});
+
 		// Start/finish bell has priority over interval bells
 		if (intervalBell && !intervalBell.paused) {
+			console.debug('[audio] playStartBell pausing active interval bell', {
+				src: intervalBell.src
+			});
+
 			intervalBell.pause();
 			intervalBell.currentTime = 0;
 			audio.bells.trackAudio(intervalBell, false);
@@ -50,6 +80,10 @@ export function useMeditationAudio() {
 			startBell.currentTime = 0;
 			audio.bells.trackAudio(startBell, true);
 			await startBell.play();
+
+			console.debug('[audio] playStartBell success', {
+				src: startBell.src
+			});
 			return true;
 		} catch (err: unknown) {
 			const error = err as Error;
@@ -70,8 +104,17 @@ export function useMeditationAudio() {
 			return false;
 		}
 
+		console.debug('[audio] playIntervalBell invoked', {
+			src: intervalBell.src,
+			isStartBellSet: Boolean(startBell),
+			isStartBellPlaying: startBell ? !startBell.paused : false
+		});
+
 		// Do not play interval bell while the start/finish bell is playing
 		if (startBell && !startBell.paused) {
+			console.debug('[audio] playIntervalBell skipped because start bell is playing', {
+				startBellSrc: startBell.src
+			});
 			return false;
 		}
 
@@ -79,6 +122,10 @@ export function useMeditationAudio() {
 			intervalBell.currentTime = 0;
 			audio.bells.trackAudio(intervalBell, true);
 			await intervalBell.play();
+
+			console.debug('[audio] playIntervalBell success', {
+				src: intervalBell.src
+			});
 			return true;
 		} catch (err: unknown) {
 			const error = err as Error;
@@ -98,6 +145,10 @@ export function useMeditationAudio() {
 			(audio): audio is HTMLAudioElement => audio !== undefined
 		);
 
+		console.debug('[audio] stopAll invoked', {
+			audioElementCount: audioElements.length
+		});
+
 		await Promise.all(
 			audioElements.map(async (audioElement) => {
 				await audioElement.pause();
@@ -110,12 +161,20 @@ export function useMeditationAudio() {
 	const updateStartBellVolume = (volume: number) => {
 		if (startBell) {
 			startBell.volume = volume;
+			console.debug('[audio] updateStartBellVolume', {
+				src: startBell.src,
+				volume
+			});
 		}
 	};
 
 	const updateIntervalBellVolume = (volume: number) => {
 		if (intervalBell) {
 			intervalBell.volume = volume;
+			console.debug('[audio] updateIntervalBellVolume', {
+				src: intervalBell.src,
+				volume
+			});
 		}
 	};
 

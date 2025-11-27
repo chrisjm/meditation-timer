@@ -103,6 +103,12 @@ const trackBellAudio = (audio: HTMLAudioElement | undefined, isPlaying: boolean)
 		activeAudio.delete(audio);
 	}
 
+	console.debug('[audio] trackBellAudio', {
+		src: audio.src,
+		isPlaying,
+		activeCount: activeAudio.size
+	});
+
 	notifySubscribers();
 };
 
