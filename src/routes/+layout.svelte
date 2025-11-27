@@ -13,9 +13,7 @@
 	injectSpeedInsights();
 </script>
 
-<div
-	class="safe-top safe-bottom px-safe-left px-safe-right min-h-screen bg-white dark:bg-slate-900"
->
+<div class="safe-top safe-bottom safe-left safe-right min-h-screen bg-white dark:bg-slate-900">
 	<ThemeToggle />
 	<SEO />
 	<NotificationContainer />
