@@ -49,7 +49,7 @@
 			transition:slide={{ duration: 200 }}
 			class="absolute top-full right-0 left-0 z-10 mt-2 grid grid-cols-2 gap-4 rounded-lg bg-white p-4 shadow-lg sm:grid-cols-4 dark:bg-slate-900"
 		>
-			{#each presets as preset}
+			{#each presets as preset (preset)}
 				<button
 					onclick={() => handlePresetClick(preset)}
 					onkeydown={(e) => handleKeyDown(e, preset)}

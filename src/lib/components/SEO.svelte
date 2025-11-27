@@ -20,6 +20,20 @@
 	// Compute full canonical URL
 	let fullCanonicalUrl = $derived(`${canonicalUrl}${$page.url.pathname}`);
 	let fullImageUrl = $derived(`${canonicalUrl}${image}`);
+	const schema = $derived({
+		'@context': 'https://schema.org',
+		'@type': 'WebApplication',
+		name: title,
+		description,
+		url: fullCanonicalUrl,
+		image: fullImageUrl,
+		applicationCategory: 'LifestyleApplication',
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD'
+		}
+	} as const);
 </script>
 
 <svelte:head>
@@ -49,22 +63,5 @@
 	<meta name="googlebot" content="index, follow" />
 
 	<!-- JSON-LD Schema -->
-	{@html `
-		<script type="application/ld+json">
-		{
-			"@context": "https://schema.org",
-			"@type": "WebApplication",
-			"name": "${title}",
-			"description": "${description}",
-			"url": "${fullCanonicalUrl}",
-			"image": "${fullImageUrl}",
-			"applicationCategory": "LifestyleApplication",
-			"offers": {
-				"@type": "Offer",
-				"price": "0",
-				"priceCurrency": "USD"
-			}
-		}
-		</script>
-	`}
+	{@html '<script type="application/ld+json">' + JSON.stringify(schema) + '</script>'}
 </svelte:head>

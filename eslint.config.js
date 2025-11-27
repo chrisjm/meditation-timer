@@ -33,5 +33,11 @@ export default ts.config(
 		rules: {
 			'svelte/no-at-html-tags': 'off'
 		}
+	},
+	{
+		files: ['**/*.svelte.ts'],
+		languageOptions: {
+			parser: ts.parser
+		}
 	}
 );

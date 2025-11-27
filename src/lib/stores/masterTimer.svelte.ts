@@ -1,3 +1,5 @@
+import { SvelteSet } from 'svelte/reactivity';
+
 export type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export interface TimerState {
@@ -16,7 +18,7 @@ let intervalHandle: ReturnType<typeof setInterval> | null = null;
 
 type TimerSubscriber = (state: TimerState) => void;
 
-const subscribers = new Set<TimerSubscriber>();
+const subscribers = new SvelteSet<TimerSubscriber>();
 
 const notifySubscribers = (): void => {
 	subscribers.forEach((run) => {

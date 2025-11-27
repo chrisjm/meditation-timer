@@ -31,7 +31,7 @@
 	};
 
 	// Handle system theme changes
-	const handleSystemThemeChange = (_event: MediaQueryListEvent) => {
+	const handleSystemThemeChange = () => {
 		const currentSettings = $timerSettings;
 		// Only update if theme is set to auto
 		if (currentSettings.theme === 'auto') {

@@ -57,7 +57,7 @@
 				role="presentation"
 			>
 				<div class="flex h-full w-full">
-					{#each processedSegments as segment}
+					{#each processedSegments as segment, index (index)}
 						<div
 							class="relative h-full"
 							style="width: {getSegmentWidth(segment.length)}; background-color: {segment.color}"
