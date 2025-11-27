@@ -16,6 +16,14 @@
 		}));
 	}
 
+	function handleSpeedModeChange(event: Event) {
+		const value = (event.target as HTMLInputElement).checked;
+		timerSettings.update((settings) => ({
+			...settings,
+			isSpeedMode: value
+		}));
+	}
+
 	function handleIntervalTimeChange(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
 		timerSettings.update((settings) => ({
@@ -116,12 +124,20 @@
 
 				{#if import.meta.env.DEV}
 					<div class="mt-8 border-t border-gray-200 pt-4 dark:border-gray-700">
-						<ToggleSwitch
-							id="debugMode"
-							checked={$timerSettings.isDebugMode}
-							onChange={handleDebugModeChange}
-							label="Debug Mode (10x faster)"
-						/>
+						<div class="space-y-4">
+							<ToggleSwitch
+								id="debugMode"
+								checked={$timerSettings.isDebugMode}
+								onChange={handleDebugModeChange}
+								label="Debug Logging"
+							/>
+							<ToggleSwitch
+								id="speedMode"
+								checked={$timerSettings.isSpeedMode}
+								onChange={handleSpeedModeChange}
+								label="Speed-up Mode (5x faster)"
+							/>
+						</div>
 					</div>
 					<StoreDebugInfo />
 				{/if}

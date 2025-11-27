@@ -27,17 +27,53 @@
 	let hasInitializedIdleDuration = $state(false);
 
 	$effect(() => {
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] updating start bell volume', {
+				volume: $timerSettings.startStopBellVolume
+			});
+		}
+
 		meditationAudio.updateStartBellVolume($timerSettings.startStopBellVolume);
 	});
 
 	$effect(() => {
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] updating interval bell volume', {
+				volume: $timerSettings.intervalBellVolume
+			});
+		}
+
 		meditationAudio.updateIntervalBellVolume($timerSettings.intervalBellVolume);
 	});
 
 	$effect(() => {
-		if ($shouldPlayInterval && $timerSettings.intervalBellEnabled) {
-			meditationAudio.playIntervalBell();
+		if (!$shouldPlayInterval || !$timerSettings.intervalBellEnabled) {
+			return;
 		}
+
+		if (isBellPlaying) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] skipping interval bell because a bell is already playing', {
+					isBellPlaying,
+					currentTime: $masterTimer.currentTime,
+					initialDuration: $masterTimer.initialDuration,
+					progress: $progress
+				});
+			}
+			return;
+		}
+
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] interval effect triggered', {
+				shouldPlayInterval: $shouldPlayInterval,
+				intervalBellEnabled: $timerSettings.intervalBellEnabled,
+				currentTime: $masterTimer.currentTime,
+				initialDuration: $masterTimer.initialDuration,
+				progress: $progress
+			});
+		}
+
+		meditationAudio.playIntervalBell();
 	});
 
 	$effect(() => {
@@ -46,12 +82,25 @@
 		}
 
 		if ($masterTimer.initialDuration === 0 && $timerSettings.duration > 0) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] initializing idle duration from settings', {
+					settingsDuration: $timerSettings.duration
+				});
+			}
+
 			masterTimer.setIdleDuration($timerSettings.duration);
 			hasInitializedIdleDuration = true;
 		}
 	});
 
 	async function handleMeditationComplete() {
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] handleMeditationComplete invoked', {
+				currentTime: $masterTimer.currentTime,
+				initialDuration: $masterTimer.initialDuration
+			});
+		}
+
 		await meditationAudio.stopAll();
 
 		if ($timerSettings.startStopBellEnabled) {
@@ -65,6 +114,13 @@
 	}
 
 	async function handleMeditationStop() {
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] handleMeditationStop invoked', {
+				currentTime: $masterTimer.currentTime,
+				initialDuration: $masterTimer.initialDuration
+			});
+		}
+
 		await meditationAudio.stopAll();
 		await wakeLock.release();
 		masterTimer.reset();
@@ -72,39 +128,82 @@
 
 	$effect(() => {
 		if ($isRunning && $masterTimer.currentTime === 0) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] completion effect triggered', {
+					isRunning: $isRunning,
+					currentTime: $masterTimer.currentTime,
+					initialDuration: $masterTimer.initialDuration
+				});
+			}
+
 			handleMeditationComplete();
 		}
 	});
 
 	async function startMeditation() {
 		if (!$isRunning) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] startMeditation invoked', {
+					currentTime: $masterTimer.currentTime,
+					initialDuration: $masterTimer.initialDuration,
+					settingsDuration: $timerSettings.duration,
+					isDebugMode: $timerSettings.isDebugMode
+				});
+			}
+
 			await meditationAudio.initializeMobileAudio();
 			await wakeLock.acquire();
 
 			if ($timerSettings.startStopBellEnabled) {
+				if ($timerSettings.isDebugMode) {
+					console.debug('[page] playing start bell on start');
+				}
+
 				await meditationAudio.playStartBell();
 			}
 
-			masterTimer.start($timerSettings.duration, $timerSettings.isDebugMode);
+			masterTimer.start($timerSettings.duration, $timerSettings.isSpeedMode);
 		}
 	}
 
 	async function pauseMeditation() {
 		const wasPaused = $isPaused;
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] pauseMeditation invoked', {
+				wasPaused,
+				isRunning: $isRunning,
+				currentTime: $masterTimer.currentTime
+			});
+		}
+
 		masterTimer.pause();
 
 		// If we just paused (was running, now paused), stop audio and release wake lock
 		if (!wasPaused && $isPaused) {
+			if ($timerSettings.isDebugMode) {
+				console.debug(
+					'[page] pause detected (running -> paused), stopping audio and releasing wake lock'
+				);
+			}
+
 			await meditationAudio.stopAll();
 			await wakeLock.release();
 		}
 		// If we just resumed (was paused, now running), reacquire wake lock
 		else if (wasPaused && !$isPaused) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] resume detected (paused -> running), acquiring wake lock');
+			}
+
 			await wakeLock.acquire();
 		}
 	}
 
 	async function resetMeditation() {
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] resetMeditation invoked');
+		}
+
 		await handleMeditationStop();
 	}
 
