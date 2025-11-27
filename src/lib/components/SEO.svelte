@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { buildJsonLdScript } from '$lib/utils/jsonLd';
 
 	interface SEOProps {
 		title?: string;
@@ -35,8 +36,7 @@
 		}
 	} as const);
 
-	const renderJsonLd = () =>
-		'<script type="application/ld+json">' + JSON.stringify(schema) + '</scr' + 'ipt>';
+	const jsonLdScript = $derived(buildJsonLdScript(schema));
 </script>
 
 <svelte:head>
@@ -66,5 +66,5 @@
 	<meta name="googlebot" content="index, follow" />
 
 	<!-- JSON-LD Schema -->
-	{@html renderJsonLd()}
+	{@html jsonLdScript}
 </svelte:head>
