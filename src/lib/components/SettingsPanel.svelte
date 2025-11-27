@@ -8,61 +8,73 @@
 
 	let { isOpen, onClose } = $props();
 
-	function handleDebugModeChange(event: Event) {
+	const handleCloseClick = (): void => {
+		onClose();
+	};
+
+	const handleCloseKeyDown = (event: KeyboardEvent): void => {
+		if (event.key !== 'Escape') {
+			return;
+		}
+
+		onClose();
+	};
+
+	const handleDebugModeChange = (event: Event): void => {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
 			isDebugMode: value
 		}));
-	}
+	};
 
-	function handleSpeedModeChange(event: Event) {
+	const handleSpeedModeChange = (event: Event): void => {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
 			isSpeedMode: value
 		}));
-	}
+	};
 
-	function handleIntervalTimeChange(event: Event) {
+	const handleIntervalTimeChange = (event: Event): void => {
 		const value = parseInt((event.target as HTMLInputElement).value);
 		timerSettings.update((settings) => ({
 			...settings,
 			intervalTime: value
 		}));
-	}
+	};
 
-	function handleStartStopBellChange(event: Event) {
+	const handleStartStopBellChange = (event: Event): void => {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
 			startStopBellEnabled: value
 		}));
-	}
+	};
 
-	function handleIntervalBellChange(event: Event) {
+	const handleIntervalBellChange = (event: Event): void => {
 		const value = (event.target as HTMLInputElement).checked;
 		timerSettings.update((settings) => ({
 			...settings,
 			intervalBellEnabled: value
 		}));
-	}
+	};
 
-	function handleStartStopVolumeChange(event: Event) {
+	const handleStartStopVolumeChange = (event: Event): void => {
 		const value = parseFloat((event.target as HTMLInputElement).value);
 		timerSettings.update((settings) => ({
 			...settings,
 			startStopBellVolume: value
 		}));
-	}
+	};
 
-	function handleIntervalVolumeChange(event: Event) {
+	const handleIntervalVolumeChange = (event: Event): void => {
 		const value = parseFloat((event.target as HTMLInputElement).value);
 		timerSettings.update((settings) => ({
 			...settings,
 			intervalBellVolume: value
 		}));
-	}
+	};
 </script>
 
 {#if isOpen}
@@ -74,8 +86,8 @@
 	>
 		<div class="relative p-6">
 			<button
-				onclick={() => onClose()}
-				onkeydown={(e) => e.key === 'Escape' && onClose()}
+				onclick={handleCloseClick}
+				onkeydown={handleCloseKeyDown}
 				class="absolute top-4 right-4 cursor-pointer rounded-full p-2 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
 				aria-label="Close settings panel"
 				tabindex="0"

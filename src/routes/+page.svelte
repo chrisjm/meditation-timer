@@ -10,7 +10,7 @@
 	import HLSAudioPlayer from '$lib/components/HLSAudioPlayer.svelte';
 	import { timerSettings, updateTimerSettings } from '$lib/stores/timerSettings.svelte';
 	import { masterTimer, progress, isRunning, isPaused } from '$lib/stores/masterTimer.svelte';
-	import { shouldPlayInterval } from '$lib/stores/intervalHandler';
+	import { shouldPlayInterval } from '$lib/stores/intervalHandler.svelte';
 	import { audio } from '$lib/stores/audio.svelte';
 	import Credits from '$lib/components/Credits.svelte';
 	import { Confetti } from 'svelte-confetti';
