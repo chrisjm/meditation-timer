@@ -162,7 +162,7 @@
 				await meditationAudio.playStartBell();
 			}
 
-			masterTimer.start($timerSettings.duration, $timerSettings.isSpeedMode);
+			masterTimer.start($timerSettings.duration);
 		}
 	}
 

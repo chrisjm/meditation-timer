@@ -9,7 +9,6 @@ export interface TimerSettings {
 	intervalBellEnabled: boolean;
 	intervalBellVolume: number;
 	isDebugMode: boolean;
-	isSpeedMode: boolean;
 	backgroundMusicEnabled: boolean;
 	backgroundMusicVolume: number;
 	theme: 'light' | 'dark' | 'auto';
@@ -23,7 +22,6 @@ const defaultSettings: TimerSettings = {
 	intervalBellEnabled: true,
 	intervalBellVolume: 0.7,
 	isDebugMode: false,
-	isSpeedMode: false,
 	backgroundMusicEnabled: true,
 	backgroundMusicVolume: 0.7,
 	theme: 'auto'
@@ -90,7 +88,6 @@ const applySettings = (settings: TimerSettings): void => {
 	timerSettingsState.intervalBellEnabled = sanitized.intervalBellEnabled;
 	timerSettingsState.intervalBellVolume = sanitized.intervalBellVolume;
 	timerSettingsState.isDebugMode = sanitized.isDebugMode;
-	timerSettingsState.isSpeedMode = sanitized.isSpeedMode;
 	timerSettingsState.backgroundMusicEnabled = sanitized.backgroundMusicEnabled;
 	timerSettingsState.backgroundMusicVolume = sanitized.backgroundMusicVolume;
 	timerSettingsState.theme = sanitized.theme;

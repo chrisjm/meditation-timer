@@ -15,7 +15,6 @@ describe('intervalHandler', () => {
 			intervalBellEnabled: true,
 			intervalBellVolume: 0.7,
 			isDebugMode: false,
-			isSpeedMode: false,
 			backgroundMusicEnabled: true,
 			backgroundMusicVolume: 0.5,
 			theme: 'auto'
@@ -47,7 +46,7 @@ describe('intervalHandler', () => {
 		it('should play when crossing first interval boundary', async () => {
 			vi.useFakeTimers();
 			timerSettings.update((s) => ({ ...s, duration: 300, intervalTime: 60 }));
-			masterTimer.start(300, true); // debug mode (200ms ticks)
+			masterTimer.start(300);
 
 			// Advance time to cross the first interval (60 seconds elapsed = currentTime 240)
 			// In debug mode, each tick is 200ms, so 61 ticks = 12200ms
@@ -78,7 +77,7 @@ describe('intervalHandler', () => {
 		it('should only trigger once per interval crossing', async () => {
 			vi.useFakeTimers();
 			timerSettings.update((s) => ({ ...s, duration: 300, intervalTime: 60 }));
-			masterTimer.start(300, true);
+			masterTimer.start(300);
 
 			await vi.advanceTimersByTimeAsync(12200);
 			const firstCheck = get(shouldPlayInterval);
@@ -101,7 +100,7 @@ describe('intervalHandler', () => {
 				if (value) triggers.push(value);
 			});
 
-			masterTimer.start(300, true);
+			masterTimer.start(300);
 
 			// Cross first interval (60s elapsed)
 			await vi.advanceTimersByTimeAsync(12200);
