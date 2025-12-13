@@ -223,7 +223,7 @@
 
 	const handleCloseModal = async () => {
 		if ($audio.hls.isPlaying) {
-			audio.hls.setPlaying(false);
+			audio.hls.setPlayingAndSyncElement(false);
 		}
 		showConfetti = false;
 		closeModal();

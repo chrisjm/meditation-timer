@@ -6,6 +6,7 @@
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audio } from '$lib/stores/audio.svelte';
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
+	import { withErrorHandling } from '$lib/utils/errorHandling';
 	import {
 		setVolume,
 		getAudioUnlocked,
@@ -36,8 +37,8 @@
 	let rafId: number | null = null;
 	let pendingTime: number | null = null;
 
-	const handlePlay = () => audio.hls.setPlaying(true);
-	const handlePause = () => audio.hls.setPlaying(false);
+	const handlePlay = () => audio.hls.setPlayingFromElement(true);
+	const handlePause = () => audio.hls.setPlayingFromElement(false);
 	const handleTimeUpdate = () => {
 		if (!audioElement) {
 			return;
@@ -102,10 +103,14 @@
 		}
 
 		if (isMobile() && !getAudioUnlocked()) {
-			try {
-				await initializeAudio([]);
-			} catch (err) {
-				console.error('Failed to initialize audio:', err);
+			const initialized = await withErrorHandling(
+				async () => {
+					await initializeAudio([]);
+					return true;
+				},
+				{ showNotification: false, notificationMessage: 'Failed to initialize audio' }
+			);
+			if (!initialized) {
 				return;
 			}
 		}

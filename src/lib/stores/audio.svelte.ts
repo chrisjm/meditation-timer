@@ -1,4 +1,12 @@
 import { SvelteSet } from 'svelte/reactivity';
+import { timerSettings, type TimerSettings } from '$lib/stores/timerSettings.svelte';
+
+const isDev = import.meta.env.DEV;
+let shouldDebugLog = isDev;
+
+timerSettings.subscribe((settings: TimerSettings) => {
+	shouldDebugLog = isDev && settings.isDebugMode;
+});
 
 export interface HLSPlayerState {
 	isPlaying: boolean;
@@ -56,7 +64,7 @@ const setHlsAudioElement = (element: HTMLAudioElement | undefined): void => {
 	notifySubscribers();
 };
 
-const setHlsPlaying = (isPlaying: boolean): void => {
+const setHlsPlayingAndSyncElement = (isPlaying: boolean): void => {
 	const current = audioState.hls;
 
 	if (current.isPlaying === isPlaying) {
@@ -72,6 +80,17 @@ const setHlsPlaying = (isPlaying: boolean): void => {
 	}
 
 	audioState.hls.isPlaying = isPlaying;
+	notifySubscribers();
+};
+
+const setHlsPlayingFromElement = (isPlaying: boolean): void => {
+	const current = audioState.hls;
+
+	if (current.isPlaying === isPlaying) {
+		return;
+	}
+
+	current.isPlaying = isPlaying;
 	notifySubscribers();
 };
 
@@ -126,11 +145,13 @@ const trackBellAudio = (audio: HTMLAudioElement | undefined, isPlaying: boolean)
 		activeAudio.delete(audio);
 	}
 
-	console.debug('[audio] trackBellAudio', {
-		src: audio.src,
-		isPlaying,
-		activeCount: activeAudio.size
-	});
+	if (shouldDebugLog) {
+		console.debug('[audio] trackBellAudio', {
+			src: audio.src,
+			isPlaying,
+			activeCount: activeAudio.size
+		});
+	}
 
 	notifySubscribers();
 };
@@ -144,7 +165,8 @@ const audio = {
 	subscribe,
 	hls: {
 		setAudioElement: setHlsAudioElement,
-		setPlaying: setHlsPlaying,
+		setPlayingAndSyncElement: setHlsPlayingAndSyncElement,
+		setPlayingFromElement: setHlsPlayingFromElement,
 		setTime: setHlsTime,
 		setDuration: setHlsDuration,
 		reset: resetHls
