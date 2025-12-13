@@ -9,7 +9,6 @@ export interface TimerSettings {
 	intervalBellEnabled: boolean;
 	intervalBellVolume: number;
 	isDebugMode: boolean;
-	isSpeedMode: boolean;
 	backgroundMusicEnabled: boolean;
 	backgroundMusicVolume: number;
 	theme: 'light' | 'dark' | 'auto';
@@ -23,7 +22,6 @@ const defaultSettings: TimerSettings = {
 	intervalBellEnabled: true,
 	intervalBellVolume: 0.7,
 	isDebugMode: false,
-	isSpeedMode: false,
 	backgroundMusicEnabled: true,
 	backgroundMusicVolume: 0.7,
 	theme: 'auto'
@@ -41,6 +39,24 @@ const sanitizeSettings = (settings: TimerSettings): TimerSettings => {
 };
 
 const STORAGE_KEY = 'timerSettings';
+
+let persistTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const persistSettings = (): void => {
+	if (typeof localStorage === 'undefined') {
+		return;
+	}
+
+	if (persistTimeout) {
+		clearTimeout(persistTimeout);
+	}
+
+	persistTimeout = setTimeout(() => {
+		persistTimeout = null;
+		const snapshot: TimerSettings = { ...timerSettingsState };
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+	}, 300);
+};
 
 const loadInitialSettings = (): TimerSettings => {
 	if (typeof localStorage === 'undefined') {
@@ -72,7 +88,6 @@ const applySettings = (settings: TimerSettings): void => {
 	timerSettingsState.intervalBellEnabled = sanitized.intervalBellEnabled;
 	timerSettingsState.intervalBellVolume = sanitized.intervalBellVolume;
 	timerSettingsState.isDebugMode = sanitized.isDebugMode;
-	timerSettingsState.isSpeedMode = sanitized.isSpeedMode;
 	timerSettingsState.backgroundMusicEnabled = sanitized.backgroundMusicEnabled;
 	timerSettingsState.backgroundMusicVolume = sanitized.backgroundMusicVolume;
 	timerSettingsState.theme = sanitized.theme;
@@ -85,10 +100,7 @@ const setTimerSettings = (settings: TimerSettings): void => {
 		run(timerSettingsState);
 	});
 
-	if (typeof localStorage !== 'undefined') {
-		const snapshot: TimerSettings = { ...timerSettingsState };
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-	}
+	persistSettings();
 };
 
 const updateTimerSettings = (updater: (settings: TimerSettings) => TimerSettings): void => {
@@ -100,10 +112,7 @@ const updateTimerSettings = (updater: (settings: TimerSettings) => TimerSettings
 		run(timerSettingsState);
 	});
 
-	if (typeof localStorage !== 'undefined') {
-		const snapshot: TimerSettings = { ...timerSettingsState };
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-	}
+	persistSettings();
 };
 
 type TimerSettingsSubscriber = (settings: TimerSettings) => void;

@@ -33,7 +33,7 @@ const clearTimerInterval = (): void => {
 	}
 };
 
-const start = (duration: number, debug: boolean = false): void => {
+const start = (duration: number): void => {
 	clearTimerInterval();
 
 	timerState.currentTime = duration;
@@ -42,22 +42,19 @@ const start = (duration: number, debug: boolean = false): void => {
 
 	notifySubscribers();
 
-	intervalHandle = setInterval(
-		() => {
-			if (timerState.status === 'running' && timerState.currentTime > 0) {
-				timerState.currentTime -= 1;
-				notifySubscribers();
-				return;
-			}
+	intervalHandle = setInterval(() => {
+		if (timerState.status === 'running' && timerState.currentTime > 0) {
+			timerState.currentTime -= 1;
+			notifySubscribers();
+			return;
+		}
 
-			if (timerState.currentTime === 0) {
-				clearTimerInterval();
-				timerState.status = 'completed';
-				notifySubscribers();
-			}
-		},
-		debug ? 200 : 1000
-	);
+		if (timerState.currentTime === 0) {
+			clearTimerInterval();
+			timerState.status = 'completed';
+			notifySubscribers();
+		}
+	}, 1000);
 };
 
 const pause = (): void => {

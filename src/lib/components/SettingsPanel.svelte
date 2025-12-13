@@ -4,7 +4,6 @@
 	import ToggleSwitch from './ToggleSwitch.svelte';
 	import VolumeSlider from './VolumeSlider.svelte';
 	import IntervalTimeInput from './IntervalTimeInput.svelte';
-	import StoreDebugInfo from './StoreDebugInfo.svelte';
 
 	let { isOpen, onClose } = $props();
 
@@ -25,14 +24,6 @@
 		timerSettings.update((settings) => ({
 			...settings,
 			isDebugMode: value
-		}));
-	};
-
-	const handleSpeedModeChange = (event: Event): void => {
-		const value = (event.target as HTMLInputElement).checked;
-		timerSettings.update((settings) => ({
-			...settings,
-			isSpeedMode: value
 		}));
 	};
 
@@ -143,15 +134,8 @@
 								onChange={handleDebugModeChange}
 								label="Debug Logging"
 							/>
-							<ToggleSwitch
-								id="speedMode"
-								checked={$timerSettings.isSpeedMode}
-								onChange={handleSpeedModeChange}
-								label="Speed-up Mode (5x faster)"
-							/>
 						</div>
 					</div>
-					<StoreDebugInfo />
 				{/if}
 			</div>
 		</div>

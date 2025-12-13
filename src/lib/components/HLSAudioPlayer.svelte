@@ -6,6 +6,7 @@
 	import VolumeControl from './audio/VolumeControl.svelte';
 	import { audio } from '$lib/stores/audio.svelte';
 	import { timerSettings } from '$lib/stores/timerSettings.svelte';
+	import { withErrorHandling } from '$lib/utils/errorHandling';
 	import {
 		setVolume,
 		getAudioUnlocked,
@@ -32,13 +33,40 @@
 	let isMediaReady = $state(false);
 	let isLoading = $state(false);
 	let mediaReadyPromise: Promise<void> | null = null;
+	let lastReportedTime = $state(0);
+	let rafId: number | null = null;
+	let pendingTime: number | null = null;
 
-	const handlePlay = () => audio.hls.setPlaying(true);
-	const handlePause = () => audio.hls.setPlaying(false);
+	const handlePlay = () => audio.hls.setPlayingFromElement(true);
+	const handlePause = () => audio.hls.setPlayingFromElement(false);
 	const handleTimeUpdate = () => {
-		if (audioElement) {
-			audio.hls.setTime(audioElement.currentTime);
+		if (!audioElement) {
+			return;
 		}
+
+		pendingTime = audioElement.currentTime;
+
+		if (rafId !== null) {
+			return;
+		}
+
+		rafId = requestAnimationFrame(() => {
+			rafId = null;
+
+			if (pendingTime === null) {
+				return;
+			}
+
+			const nextTime = pendingTime;
+			pendingTime = null;
+
+			if (Math.abs(nextTime - lastReportedTime) < 0.25) {
+				return;
+			}
+
+			lastReportedTime = nextTime;
+			audio.hls.setTime(nextTime);
+		});
 	};
 	const handleDurationChange = () => {
 		if (audioElement) {
@@ -75,10 +103,14 @@
 		}
 
 		if (isMobile() && !getAudioUnlocked()) {
-			try {
-				await initializeAudio([]);
-			} catch (err) {
-				console.error('Failed to initialize audio:', err);
+			const initialized = await withErrorHandling(
+				async () => {
+					await initializeAudio([]);
+					return true;
+				},
+				{ showNotification: false, notificationMessage: 'Failed to initialize audio' }
+			);
+			if (!initialized) {
 				return;
 			}
 		}
@@ -217,6 +249,13 @@
 	};
 
 	onDestroy(() => {
+		if (rafId !== null) {
+			cancelAnimationFrame(rafId);
+			rafId = null;
+		}
+		pendingTime = null;
+		lastReportedTime = 0;
+
 		destroyHls();
 		audio.hls.setAudioElement(undefined);
 		audio.hls.reset();

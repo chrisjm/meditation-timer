@@ -14,15 +14,26 @@
 	}>();
 
 	// Calculate segment positions
-	let processedSegments = $derived(
-		segments.map((segment: Segment, index: number) => ({
-			...segment,
-			color: segment.color,
-			startTime: segments
-				.slice(0, index)
-				.reduce((acc: number, curr: Segment) => acc + curr.length, 0)
-		}))
-	);
+	let processedSegments = $derived.by(() => {
+		const safeSegments = segments ?? [];
+		let startTime = 0;
+		return safeSegments.map((segment: Segment) => {
+			const next = {
+				...segment,
+				color: segment.color,
+				startTime
+			};
+			startTime += segment.length;
+			return next;
+		});
+	});
+
+	let currentSegment = $derived.by(() => {
+		return processedSegments.find(
+			(segment: Segment) =>
+				currentTime >= segment.startTime! && currentTime < segment.startTime! + segment.length
+		);
+	});
 
 	function formatTime(seconds: number): string {
 		const minutes = Math.floor(seconds / 60);
@@ -37,13 +48,6 @@
 
 	function getSegmentWidth(length: number): string {
 		return `${(length / duration) * 100}%`;
-	}
-
-	function getCurrentSegment(): Segment | undefined {
-		return processedSegments.find(
-			(segment: Segment) =>
-				currentTime >= segment.startTime! && currentTime < segment.startTime! + segment.length
-		);
 	}
 </script>
 
@@ -80,7 +84,7 @@
 		<span class="w-10">{formatTime(duration || 0)}</span>
 	</div>
 	<!-- Current segment description -->
-	{#if getCurrentSegment()}
-		<p class="text-center text-xs">{getCurrentSegment()?.description}</p>
+	{#if currentSegment}
+		<p class="text-center text-xs">{currentSegment.description}</p>
 	{/if}
 </div>
