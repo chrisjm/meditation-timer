@@ -17,14 +17,18 @@
 	import { useWakeLock } from '$lib/composables/useWakeLock.svelte';
 	import { useMeditationAudio } from '$lib/composables/useMeditationAudio.svelte';
 	import { AUDIO_CONFIG } from '$lib/config/audio';
+	import { getAudioUnlocked, isMobile } from '$lib/utils/mobileAudioManager';
 
 	const wakeLock = useWakeLock();
 	const meditationAudio = useMeditationAudio();
+	const isMobileDevice = isMobile();
 
 	let isBellPlaying = $derived($audio.bells.activeAudio.size > 0);
 	let isSettingsOpen = $state(false);
 	let showConfetti = $state(false);
 	let hasInitializedIdleDuration = $state(false);
+	let isMobileEnableOverlayOpen = $state(false);
+	let isMobileEnableOverlayLoading = $state(false);
 
 	$effect(() => {
 		if ($timerSettings.isDebugMode) {
@@ -109,7 +113,9 @@
 			await meditationAudio.playStartBell();
 		}
 
-		await wakeLock.release();
+		if (isMobileDevice) {
+			await wakeLock.release();
+		}
 		masterTimer.reset();
 		showConfetti = true;
 		openModal("Great job! You've completed your meditation session.");
@@ -124,7 +130,9 @@
 		}
 
 		await meditationAudio.stopAll();
-		await wakeLock.release();
+		if (isMobileDevice) {
+			await wakeLock.release();
+		}
 		masterTimer.reset();
 	}
 
@@ -142,30 +150,72 @@
 		}
 	});
 
-	async function startMeditation() {
-		if (!$isRunning) {
-			if ($timerSettings.isDebugMode) {
-				console.debug('[page] startMeditation invoked', {
-					currentTime: $masterTimer.currentTime,
-					initialDuration: $masterTimer.initialDuration,
-					settingsDuration: $timerSettings.duration,
-					isDebugMode: $timerSettings.isDebugMode
-				});
-			}
-
-			await meditationAudio.initializeMobileAudio();
-			await wakeLock.acquire();
-
-			if ($timerSettings.startStopBellEnabled) {
-				if ($timerSettings.isDebugMode) {
-					console.debug('[page] playing start bell on start');
-				}
-
-				await meditationAudio.playStartBell();
-			}
-
-			masterTimer.start($timerSettings.duration);
+	const closeMobileEnableOverlay = () => {
+		if (isMobileEnableOverlayLoading) {
+			return;
 		}
+		isMobileEnableOverlayOpen = false;
+	};
+
+	const handleMobileEnableOverlayKeyDown = (event: KeyboardEvent) => {
+		if (event.key !== 'Escape') {
+			return;
+		}
+		closeMobileEnableOverlay();
+	};
+
+	const startMeditationCore = async () => {
+		if ($timerSettings.startStopBellEnabled) {
+			if ($timerSettings.isDebugMode) {
+				console.debug('[page] playing start bell on start');
+			}
+
+			await meditationAudio.playStartBell();
+		}
+
+		masterTimer.start($timerSettings.duration);
+	};
+
+	const handleEnableMobileAndStart = async () => {
+		if (isMobileEnableOverlayLoading) {
+			return;
+		}
+
+		isMobileEnableOverlayLoading = true;
+		audio.hls.setPlayingAndSyncElement(true);
+		const audioInitPromise = meditationAudio.initializeMobileAudio();
+		const wakeLockPromise = wakeLock.acquire();
+		await Promise.all([audioInitPromise, wakeLockPromise]);
+		isMobileEnableOverlayOpen = false;
+		isMobileEnableOverlayLoading = false;
+		await startMeditationCore();
+	};
+
+	async function startMeditation() {
+		if ($isRunning) {
+			return;
+		}
+
+		if ($timerSettings.isDebugMode) {
+			console.debug('[page] startMeditation invoked', {
+				currentTime: $masterTimer.currentTime,
+				initialDuration: $masterTimer.initialDuration,
+				settingsDuration: $timerSettings.duration,
+				isDebugMode: $timerSettings.isDebugMode,
+				isMobileDevice
+			});
+		}
+
+		if (isMobileDevice && (!getAudioUnlocked() || !$audio.hls.isPlaying)) {
+			isMobileEnableOverlayOpen = true;
+			return;
+		}
+
+		if (isMobileDevice) {
+			await wakeLock.acquire();
+		}
+
+		await startMeditationCore();
 	}
 
 	async function pauseMeditation() {
@@ -189,7 +239,9 @@
 			}
 
 			await meditationAudio.stopAll();
-			await wakeLock.release();
+			if (isMobileDevice) {
+				await wakeLock.release();
+			}
 		}
 		// If we just resumed (was paused, now running), reacquire wake lock
 		else if (wasPaused && !$isPaused) {
@@ -197,7 +249,9 @@
 				console.debug('[page] resume detected (paused -> running), acquiring wake lock');
 			}
 
-			await wakeLock.acquire();
+			if (isMobileDevice) {
+				await wakeLock.acquire();
+			}
 		}
 	}
 
@@ -251,6 +305,43 @@
 		onIntervalBellReady={meditationAudio.setIntervalBell}
 	/>
 	<SettingsPanel isOpen={isSettingsOpen} onClose={() => (isSettingsOpen = false)} />
+	{#if isMobileDevice && isMobileEnableOverlayOpen}
+		<div
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Enable audio and keep screen awake"
+			onkeydown={handleMobileEnableOverlayKeyDown}
+			tabindex="0"
+		>
+			<div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900">
+				<h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Enable mobile mode</h2>
+				<p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+					Mobile browsers may pause timers when the screen locks. This will enable bell audio,
+					request Wake Lock (when supported), and start background audio to help the timer stay
+					active.
+				</p>
+				<div class="mt-6 flex flex-col gap-3">
+					<button
+						onclick={handleEnableMobileAndStart}
+						disabled={isMobileEnableOverlayLoading}
+						class="w-full rounded-xl bg-emerald-600 px-4 py-3 text-base font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+						aria-label="Enable audio and start meditation"
+					>
+						{isMobileEnableOverlayLoading ? 'Enabling…' : 'Enable & Start'}
+					</button>
+					<button
+						onclick={closeMobileEnableOverlay}
+						disabled={isMobileEnableOverlayLoading}
+						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+						aria-label="Cancel enabling mobile mode"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 	<main class="mx-auto w-full max-w-3xl text-center">
 		<h1 class="mb-8 text-4xl font-light tracking-wide text-slate-800 dark:text-slate-100">
 			Meditation Timer
