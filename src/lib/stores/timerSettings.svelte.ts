@@ -42,6 +42,24 @@ const sanitizeSettings = (settings: TimerSettings): TimerSettings => {
 
 const STORAGE_KEY = 'timerSettings';
 
+let persistTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const persistSettings = (): void => {
+	if (typeof localStorage === 'undefined') {
+		return;
+	}
+
+	if (persistTimeout) {
+		clearTimeout(persistTimeout);
+	}
+
+	persistTimeout = setTimeout(() => {
+		persistTimeout = null;
+		const snapshot: TimerSettings = { ...timerSettingsState };
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+	}, 300);
+};
+
 const loadInitialSettings = (): TimerSettings => {
 	if (typeof localStorage === 'undefined') {
 		return defaultSettings;
@@ -85,10 +103,7 @@ const setTimerSettings = (settings: TimerSettings): void => {
 		run(timerSettingsState);
 	});
 
-	if (typeof localStorage !== 'undefined') {
-		const snapshot: TimerSettings = { ...timerSettingsState };
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-	}
+	persistSettings();
 };
 
 const updateTimerSettings = (updater: (settings: TimerSettings) => TimerSettings): void => {
@@ -100,10 +115,7 @@ const updateTimerSettings = (updater: (settings: TimerSettings) => TimerSettings
 		run(timerSettingsState);
 	});
 
-	if (typeof localStorage !== 'undefined') {
-		const snapshot: TimerSettings = { ...timerSettingsState };
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-	}
+	persistSettings();
 };
 
 type TimerSettingsSubscriber = (settings: TimerSettings) => void;

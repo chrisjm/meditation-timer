@@ -4,8 +4,14 @@ import { initializeAudio } from '$lib/utils/mobileAudioManager';
 export function useMeditationAudio() {
 	let startBell = $state<HTMLAudioElement | undefined>();
 	let intervalBell = $state<HTMLAudioElement | undefined>();
+	let startBellEndedListener: (() => void) | null = null;
+	let intervalBellEndedListener: (() => void) | null = null;
 
 	const setStartBell = (element: HTMLAudioElement | undefined) => {
+		if (startBell && startBellEndedListener) {
+			startBell.removeEventListener('ended', startBellEndedListener);
+		}
+
 		startBell = element;
 
 		console.debug('[audio] setStartBell', {
@@ -14,11 +20,18 @@ export function useMeditationAudio() {
 		});
 
 		if (element) {
-			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
+			startBellEndedListener = () => audio.bells.trackAudio(element, false);
+			element.addEventListener('ended', startBellEndedListener);
+		} else {
+			startBellEndedListener = null;
 		}
 	};
 
 	const setIntervalBell = (element: HTMLAudioElement | undefined) => {
+		if (intervalBell && intervalBellEndedListener) {
+			intervalBell.removeEventListener('ended', intervalBellEndedListener);
+		}
+
 		intervalBell = element;
 
 		console.debug('[audio] setIntervalBell', {
@@ -27,7 +40,10 @@ export function useMeditationAudio() {
 		});
 
 		if (element) {
-			element.addEventListener('ended', () => audio.bells.trackAudio(element, false));
+			intervalBellEndedListener = () => audio.bells.trackAudio(element, false);
+			element.addEventListener('ended', intervalBellEndedListener);
+		} else {
+			intervalBellEndedListener = null;
 		}
 	};
 

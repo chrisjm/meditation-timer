@@ -48,12 +48,20 @@ const subscribe = (run: AudioSubscriber): (() => void) => {
 };
 
 const setHlsAudioElement = (element: HTMLAudioElement | undefined): void => {
+	if (audioState.hls.audioElement === element) {
+		return;
+	}
+
 	audioState.hls.audioElement = element;
 	notifySubscribers();
 };
 
 const setHlsPlaying = (isPlaying: boolean): void => {
 	const current = audioState.hls;
+
+	if (current.isPlaying === isPlaying) {
+		return;
+	}
 
 	if (current.audioElement && current.isPlaying !== isPlaying) {
 		if (isPlaying) {
@@ -68,11 +76,19 @@ const setHlsPlaying = (isPlaying: boolean): void => {
 };
 
 const setHlsTime = (currentTime: number): void => {
+	if (audioState.hls.currentTime === currentTime) {
+		return;
+	}
+
 	audioState.hls.currentTime = currentTime;
 	notifySubscribers();
 };
 
 const setHlsDuration = (duration: number): void => {
+	if (audioState.hls.duration === duration) {
+		return;
+	}
+
 	audioState.hls.duration = duration;
 	notifySubscribers();
 };
@@ -98,6 +114,11 @@ const trackBellAudio = (audio: HTMLAudioElement | undefined, isPlaying: boolean)
 	}
 
 	const activeAudio = audioState.bells.activeAudio;
+	const isCurrentlyActive = activeAudio.has(audio);
+
+	if (isPlaying === isCurrentlyActive) {
+		return;
+	}
 
 	if (isPlaying) {
 		activeAudio.add(audio);

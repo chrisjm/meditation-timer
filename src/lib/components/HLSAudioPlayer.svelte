@@ -32,13 +32,40 @@
 	let isMediaReady = $state(false);
 	let isLoading = $state(false);
 	let mediaReadyPromise: Promise<void> | null = null;
+	let lastReportedTime = $state(0);
+	let rafId: number | null = null;
+	let pendingTime: number | null = null;
 
 	const handlePlay = () => audio.hls.setPlaying(true);
 	const handlePause = () => audio.hls.setPlaying(false);
 	const handleTimeUpdate = () => {
-		if (audioElement) {
-			audio.hls.setTime(audioElement.currentTime);
+		if (!audioElement) {
+			return;
 		}
+
+		pendingTime = audioElement.currentTime;
+
+		if (rafId !== null) {
+			return;
+		}
+
+		rafId = requestAnimationFrame(() => {
+			rafId = null;
+
+			if (pendingTime === null) {
+				return;
+			}
+
+			const nextTime = pendingTime;
+			pendingTime = null;
+
+			if (Math.abs(nextTime - lastReportedTime) < 0.25) {
+				return;
+			}
+
+			lastReportedTime = nextTime;
+			audio.hls.setTime(nextTime);
+		});
 	};
 	const handleDurationChange = () => {
 		if (audioElement) {
@@ -217,6 +244,13 @@
 	};
 
 	onDestroy(() => {
+		if (rafId !== null) {
+			cancelAnimationFrame(rafId);
+			rafId = null;
+		}
+		pendingTime = null;
+		lastReportedTime = 0;
+
 		destroyHls();
 		audio.hls.setAudioElement(undefined);
 		audio.hls.reset();
