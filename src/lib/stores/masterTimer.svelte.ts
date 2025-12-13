@@ -15,6 +15,54 @@ const timerState = $state<TimerState>({
 });
 
 let intervalHandle: ReturnType<typeof setInterval> | null = null;
+let endTimestampMs: number | null = null;
+let pauseStartedAtMs: number | null = null;
+let hasReachedZero = false;
+
+let lifecycleCleanup: (() => void) | null = null;
+
+const attachLifecycleListeners = (): void => {
+	if (lifecycleCleanup) {
+		return;
+	}
+
+	if (typeof document === 'undefined' || typeof window === 'undefined') {
+		return;
+	}
+
+	const handleVisibilityChange = () => {
+		if (document.visibilityState === 'visible') {
+			tick();
+		}
+	};
+
+	const handleFocus = () => {
+		tick();
+	};
+
+	const handlePageShow = () => {
+		tick();
+	};
+
+	document.addEventListener('visibilitychange', handleVisibilityChange);
+	window.addEventListener('focus', handleFocus);
+	window.addEventListener('pageshow', handlePageShow);
+
+	lifecycleCleanup = () => {
+		document.removeEventListener('visibilitychange', handleVisibilityChange);
+		window.removeEventListener('focus', handleFocus);
+		window.removeEventListener('pageshow', handlePageShow);
+	};
+};
+
+const detachLifecycleListeners = (): void => {
+	if (!lifecycleCleanup) {
+		return;
+	}
+
+	lifecycleCleanup();
+	lifecycleCleanup = null;
+};
 
 type TimerSubscriber = (state: TimerState) => void;
 
@@ -33,8 +81,46 @@ const clearTimerInterval = (): void => {
 	}
 };
 
+const tick = (): void => {
+	if (timerState.status !== 'running' || endTimestampMs === null) {
+		return;
+	}
+
+	if (hasReachedZero && timerState.currentTime === 0) {
+		clearTimerInterval();
+		hasReachedZero = false;
+		timerState.status = 'completed';
+		notifySubscribers();
+		return;
+	}
+
+	const remainingSeconds = Math.max(0, Math.ceil((endTimestampMs - Date.now()) / 1000));
+
+	if (remainingSeconds !== timerState.currentTime) {
+		timerState.currentTime = remainingSeconds;
+		notifySubscribers();
+	}
+
+	if (remainingSeconds === 0) {
+		hasReachedZero = true;
+	}
+};
+
+const startTimerInterval = (): void => {
+	clearTimerInterval();
+	intervalHandle = setInterval(tick, 1000);
+};
+
+const clearRuntimeState = (): void => {
+	endTimestampMs = null;
+	pauseStartedAtMs = null;
+	hasReachedZero = false;
+};
+
 const start = (duration: number): void => {
 	clearTimerInterval();
+	clearRuntimeState();
+	attachLifecycleListeners();
 
 	timerState.currentTime = duration;
 	timerState.status = 'running';
@@ -42,26 +128,25 @@ const start = (duration: number): void => {
 
 	notifySubscribers();
 
-	intervalHandle = setInterval(() => {
-		if (timerState.status === 'running' && timerState.currentTime > 0) {
-			timerState.currentTime -= 1;
-			notifySubscribers();
-			return;
-		}
-
-		if (timerState.currentTime === 0) {
-			clearTimerInterval();
-			timerState.status = 'completed';
-			notifySubscribers();
-		}
-	}, 1000);
+	endTimestampMs = Date.now() + duration * 1000;
+	startTimerInterval();
+	tick();
 };
 
 const pause = (): void => {
 	if (timerState.status === 'running') {
+		pauseStartedAtMs = Date.now();
+		clearTimerInterval();
+		hasReachedZero = false;
 		timerState.status = 'paused';
 	} else if (timerState.status === 'paused') {
+		if (pauseStartedAtMs !== null && endTimestampMs !== null) {
+			endTimestampMs += Date.now() - pauseStartedAtMs;
+		}
+		pauseStartedAtMs = null;
 		timerState.status = 'running';
+		startTimerInterval();
+		tick();
 	}
 
 	notifySubscribers();
@@ -69,6 +154,8 @@ const pause = (): void => {
 
 const reset = (): void => {
 	clearTimerInterval();
+	clearRuntimeState();
+	detachLifecycleListeners();
 
 	timerState.currentTime = timerState.initialDuration;
 	timerState.status = 'idle';
@@ -78,6 +165,8 @@ const reset = (): void => {
 
 const stop = (): void => {
 	clearTimerInterval();
+	clearRuntimeState();
+	detachLifecycleListeners();
 
 	timerState.currentTime = timerState.initialDuration;
 	timerState.status = 'idle';
@@ -87,6 +176,8 @@ const stop = (): void => {
 
 const setIdleDuration = (duration: number): void => {
 	clearTimerInterval();
+	clearRuntimeState();
+	detachLifecycleListeners();
 
 	timerState.currentTime = duration;
 	timerState.initialDuration = duration;
@@ -97,6 +188,8 @@ const setIdleDuration = (duration: number): void => {
 
 const cleanup = (): void => {
 	clearTimerInterval();
+	clearRuntimeState();
+	detachLifecycleListeners();
 };
 
 const subscribe = (run: TimerSubscriber): (() => void) => {

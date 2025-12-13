@@ -14,35 +14,37 @@ export const shouldPlayInterval = derived([masterTimer, timerSettings], ([$timer
 			});
 		}
 		playedIntervals.clear();
-		return false;
+		return null;
 	}
 
 	if ($settings.intervalTime <= 0) {
-		return false;
+		return null;
 	}
 
 	const elapsedTime = $timer.initialDuration - $timer.currentTime;
 
 	if (elapsedTime <= 0 || $timer.currentTime <= 0) {
-		return false;
+		return null;
 	}
 
 	const currentIntervalIndex = Math.floor(elapsedTime / $settings.intervalTime);
 
 	const shouldPlay = currentIntervalIndex > 0 && !playedIntervals.has(currentIntervalIndex);
 
-	if (shouldPlay) {
-		playedIntervals.add(currentIntervalIndex);
-
-		console.debug('[interval] shouldPlayInterval = true', {
-			elapsedTime,
-			currentTime: $timer.currentTime,
-			initialDuration: $timer.initialDuration,
-			intervalTime: $settings.intervalTime,
-			currentIntervalIndex,
-			playedIntervals: Array.from(playedIntervals.values())
-		});
+	if (!shouldPlay) {
+		return null;
 	}
 
-	return shouldPlay;
+	playedIntervals.add(currentIntervalIndex);
+
+	console.debug('[interval] shouldPlayInterval', {
+		elapsedTime,
+		currentTime: $timer.currentTime,
+		initialDuration: $timer.initialDuration,
+		intervalTime: $settings.intervalTime,
+		currentIntervalIndex,
+		playedIntervals: Array.from(playedIntervals.values())
+	});
+
+	return currentIntervalIndex;
 });

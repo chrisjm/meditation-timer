@@ -47,7 +47,8 @@
 	});
 
 	$effect(() => {
-		if (!$shouldPlayInterval || !$timerSettings.intervalBellEnabled) {
+		const intervalIndex = $shouldPlayInterval;
+		if (typeof intervalIndex !== 'number' || !$timerSettings.intervalBellEnabled) {
 			return;
 		}
 
@@ -55,6 +56,7 @@
 			if ($timerSettings.isDebugMode) {
 				console.debug('[page] skipping interval bell because a bell is already playing', {
 					isBellPlaying,
+					intervalIndex,
 					currentTime: $masterTimer.currentTime,
 					initialDuration: $masterTimer.initialDuration,
 					progress: $progress
@@ -65,7 +67,7 @@
 
 		if ($timerSettings.isDebugMode) {
 			console.debug('[page] interval effect triggered', {
-				shouldPlayInterval: $shouldPlayInterval,
+				intervalIndex,
 				intervalBellEnabled: $timerSettings.intervalBellEnabled,
 				currentTime: $masterTimer.currentTime,
 				initialDuration: $masterTimer.initialDuration,
