@@ -49,8 +49,7 @@ describe('intervalHandler', () => {
 			masterTimer.start(300);
 
 			// Advance time to cross the first interval (60 seconds elapsed = currentTime 240)
-			// In debug mode, each tick is 200ms, so 61 ticks = 12200ms
-			await vi.advanceTimersByTimeAsync(12200);
+			await vi.advanceTimersByTimeAsync(60_000);
 
 			const shouldPlay = get(shouldPlayInterval);
 			// After crossing 60s elapsed, should have triggered
@@ -79,12 +78,12 @@ describe('intervalHandler', () => {
 			timerSettings.update((s) => ({ ...s, duration: 300, intervalTime: 60 }));
 			masterTimer.start(300);
 
-			await vi.advanceTimersByTimeAsync(12200);
+			await vi.advanceTimersByTimeAsync(60_000);
 			const firstCheck = get(shouldPlayInterval);
 			expect(firstCheck).toBe(true);
 
 			// Check again without crossing another interval (one more tick)
-			await vi.advanceTimersByTimeAsync(200);
+			await vi.advanceTimersByTimeAsync(1_000);
 			const secondCheck = get(shouldPlayInterval);
 			expect(secondCheck).toBe(false);
 
@@ -103,11 +102,11 @@ describe('intervalHandler', () => {
 			masterTimer.start(300);
 
 			// Cross first interval (60s elapsed)
-			await vi.advanceTimersByTimeAsync(12200);
+			await vi.advanceTimersByTimeAsync(60_000);
 			expect(triggers.length).toBeGreaterThanOrEqual(1);
 
-			// Cross second interval (120s elapsed) - need another 12000ms
-			await vi.advanceTimersByTimeAsync(12000);
+			// Cross second interval (120s elapsed)
+			await vi.advanceTimersByTimeAsync(60_000);
 			expect(triggers.length).toBeGreaterThanOrEqual(2);
 
 			unsubscribe();
