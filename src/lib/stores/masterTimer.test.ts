@@ -9,6 +9,8 @@ describe('masterTimer', () => {
 	});
 
 	afterEach(() => {
+		masterTimer.cleanup();
+		vi.useRealTimers();
 		vi.restoreAllMocks();
 	});
 
