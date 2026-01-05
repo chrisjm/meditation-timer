@@ -2,7 +2,7 @@
 	import Modal from './Modal.svelte';
 	import credits from '$lib/content/credits.md?raw';
 	import { marked } from 'marked';
-	import { MessageCircle } from 'lucide-svelte';
+	import { MessageCircle, Coffee } from 'lucide-svelte';
 
 	let isOpen = $state(false);
 	const parsedCredits = marked(credits);
@@ -46,6 +46,18 @@
 	>
 		<MessageCircle class="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
 		<span>Join our Discord</span>
+	</a>
+
+	<a
+		href="https://buymeacoffee.com/chrisjm"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="group flex items-center gap-2 rounded-full border border-transparent bg-amber-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-all duration-200 hover:bg-amber-600 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none md:px-4 md:py-2 md:shadow-md md:hover:shadow-lg dark:bg-amber-400 dark:text-amber-950 dark:hover:bg-amber-300 dark:hover:text-amber-900"
+		aria-label="Buy Chris a tea"
+		tabindex="0"
+	>
+		<Coffee class="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+		<span>Buy Me a Tea</span>
 	</a>
 
 	<button
